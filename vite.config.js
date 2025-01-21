@@ -6,12 +6,17 @@ export default defineConfig({
   server: {
     port: 8080
   },
+  define: {
+    'process.env': process.env
+  },
   build: {
+    outDir: 'dist',
     rollupOptions: {
       external: [
         'react',
-        'react-dom',  // Exclude large external dependencies
+        'react-dom'
       ],
     },
   },
+  base: './'
 });
