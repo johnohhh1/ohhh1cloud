@@ -1,0 +1,6 @@
+Selected APIs:
+Google Drive API
+Google Play Android Developer API
+Google Cloud Storage JSON API
+Google Cloud APIs
+Service Usage API

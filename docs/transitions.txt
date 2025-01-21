@@ -1,0 +1,218 @@
+SLIDESHOW TRANSITIONS
+===================
+
+Based on Framer Motion's animation capabilities, our slideshow supports the following transitions:
+
+AVAILABLE TRANSITIONS
+------------------
+1. slide-horizontal
+   - Slides images horizontally with opacity fade
+   - Uses transform: translateX for performance
+   - Direction based on transitionEffect (1 or -1)
+
+2. slide-vertical  
+   - Slides images vertically with opacity fade
+   - Uses transform: translateY for performance
+   - Good for vertical photo galleries
+
+3. fade
+   - Simple opacity crossfade between images
+   - Most subtle transition
+   - Good default choice
+
+4. zoom
+   - Scales image in/out with opacity
+   - Creates depth effect
+   - Good for emphasizing new images
+
+5. ripple
+   - Ripple effect between transitions
+   - Uses Framer Motion's layout animations
+   - More dramatic transition
+
+6. morph
+   - Morphs between images
+   - Uses advanced interpolation
+   - Good for similar-shaped images
+
+7. elastic
+   - Bouncy transition effect
+   - Uses spring animations
+   - Playful interaction feel
+
+8. swirl
+   - Rotating swirl effect
+   - Combines rotation and scale
+   - Most dramatic transition
+
+9. cube
+   - 3D cube rotation effect
+   - Uses perspective and rotateY
+   - Creates immersive depth effect
+   ```javascript
+   'cube': {
+     initial: { rotateY: 90, opacity: 0, z: -300 },
+     animate: { rotateY: 0, opacity: 1, z: 0 },
+     exit: { rotateY: -90, opacity: 0, z: -300 },
+     transition: { type: "tween", duration: 0.8 }
+   }
+   ```
+
+10. flip
+    - Card flip effect
+    - Combines rotateX/Y with scale
+    - Good for presentation style
+    ```javascript
+    'flip': {
+      initial: { rotateX: 90, scale: 0.5, opacity: 0 },
+      animate: { rotateX: 0, scale: 1, opacity: 1 },
+      exit: { rotateX: -90, scale: 0.5, opacity: 0 },
+      transition: { type: "spring", stiffness: 300 }
+    }
+    ```
+
+11. carousel
+    - Circular rotation effect
+    - Uses transform-origin and rotate
+    - Great for multiple images
+    ```javascript
+    'carousel': {
+      initial: { rotate: 180, scale: 0, opacity: 0 },
+      animate: { rotate: 0, scale: 1, opacity: 1 },
+      exit: { rotate: -180, scale: 0, opacity: 0 },
+      transition: { duration: 0.7 }
+    }
+    ```
+
+12. blur
+    - Smooth blur transition
+    - Uses filter: blur with opacity
+    - Elegant effect
+    ```javascript
+    'blur': {
+      initial: { filter: "blur(20px)", opacity: 0 },
+      animate: { filter: "blur(0px)", opacity: 1 },
+      exit: { filter: "blur(20px)", opacity: 0 },
+      transition: { duration: 0.5 }
+    }
+    ```
+
+13. wave
+    - Wave distortion effect
+    - Uses custom keyframes
+    - Dynamic and fluid
+    ```javascript
+    'wave': {
+      initial: { y: 100, skewY: 10, opacity: 0 },
+      animate: { y: 0, skewY: 0, opacity: 1 },
+      exit: { y: -100, skewY: -10, opacity: 0 },
+      transition: { type: "spring", damping: 15 }
+    }
+    ```
+
+14. shutter
+    - Camera shutter effect
+    - Uses scaleY and opacity
+    - Professional look
+    ```javascript
+    'shutter': {
+      initial: { scaleY: 0, opacity: 0 },
+      animate: { scaleY: 1, opacity: 1 },
+      exit: { scaleY: 0, opacity: 0 },
+      transition: { duration: 0.4, ease: "easeInOut" }
+    }
+    ```
+
+IMPLEMENTATION
+------------
+```javascript
+// In store.js
+const transitions = [
+  'slide-horizontal',
+  'slide-vertical', 
+  'ripple',
+  'morph',
+  'elastic',
+  'swirl',
+  'fade',
+  'zoom'
+]
+
+// Random transition selection
+const randomTransition = transitions[Math.floor(Math.random() * transitions.length)]
+
+// Applied using Framer Motion
+<motion.div
+  initial={transitions[currentTransition].initial}
+  animate={transitions[currentTransition].animate}
+  exit={transitions[currentTransition].exit}
+  transition={{ duration: 0.5 }}
+/>
+```
+
+CUSTOMIZATION
+-----------
+Each transition can be customized via:
+- Duration
+- Easing
+- Direction
+- Spring physics (for elastic)
+- Opacity fade amount
+- Scale factors
+
+PERFORMANCE NOTES
+--------------
+- All transitions use transform/opacity for GPU acceleration
+- Heavy transitions (ripple/morph) use layout animations
+- Preload next image for smoother transitions
+- Cleanup previous transition before starting new one 
+
+ADVANCED CUSTOMIZATION
+-------------------
+Combine transitions for unique effects:
+```javascript
+const combinedTransition = {
+  initial: { 
+    scale: 0, 
+    rotate: 180, 
+    opacity: 0 
+  },
+  animate: { 
+    scale: 1, 
+    rotate: 0, 
+    opacity: 1 
+  },
+  exit: { 
+    scale: 0, 
+    rotate: -180, 
+    opacity: 0 
+  },
+  transition: { 
+    duration: 0.6,
+    ease: [0.43, 0.13, 0.23, 0.96] // Custom easing
+  }
+}
+```
+
+GESTURE INTERACTIONS
+-----------------
+Add gesture support to transitions:
+```javascript
+<motion.div
+  drag="x"
+  dragConstraints={{ left: 0, right: 0 }}
+  dragElastic={1}
+  onDragEnd={(e, { offset, velocity }) => {
+    const swipe = Math.abs(velocity.x) * offset.x;
+    if (swipe < -10000) {
+      // Swipe left
+      nextImage();
+    } else if (swipe > 10000) {
+      // Swipe right
+      previousImage();
+    }
+  }}
+>
+  {/* Image content */}
+</motion.div>
+``` 
