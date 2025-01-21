@@ -154,8 +154,10 @@ export default function App() {
   } = useStore()
 
   React.useEffect(() => {
-    startSlideshow()
-    return () => stopSlideshow()
+    if (settings.interval) {
+      startSlideshow()
+      return () => stopSlideshow()
+    }
   }, [settings.interval, settings.transition])
 
   return (
@@ -165,7 +167,8 @@ export default function App() {
         style={{ backgroundImage: `url(${currentImage})` }}
       />
       <div className="absolute inset-0 bg-black/30" />
-      <AnimatePresence initial={false} custom={transitionEffect}>
+      
+      <AnimatePresence mode="wait" initial={false} custom={transitionEffect}>
         <motion.img
           key={currentImage}
           src={currentImage}
@@ -175,13 +178,13 @@ export default function App() {
           animate="center"
           exit="exit"
           transition={{
-            duration: 0.8,
+            duration: settings.transitionDuration || 0.8,
             type: "spring",
             stiffness: 200,
             damping: 20,
             opacity: { duration: 0.5 }
           }}
-          className="slide relative z-10"
+          className="absolute inset-0 w-full h-full object-contain"
         />
       </AnimatePresence>
       

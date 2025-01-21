@@ -1,5 +1,5 @@
 import React from 'react'
-import { animated, useSpring } from '@react-spring/web'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from '../store'
 import GoogleDriveAuth from './GoogleDriveAuth'
 import DropboxAuth from './DropboxAuth'
@@ -62,15 +62,12 @@ export default function Settings() {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
   }, [])
 
-  const slideIn = useSpring({
-    from: { transform: 'translateX(100%)' },
-    to: { transform: 'translateX(0%)' },
-    config: { tension: 200, friction: 20 }
-  })
-
   return (
-    <animated.div
-      style={slideIn}
+    <motion.div
+      initial={{ x: '100%' }}
+      animate={{ x: 0 }}
+      exit={{ x: '100%' }}
+      transition={{ type: 'spring', damping: 20, stiffness: 200 }}
       className="fixed top-0 right-0 w-80 h-full bg-gray-900 p-6 shadow-lg z-40 overflow-y-auto"
     >
       <div className="flex justify-between items-center mb-8">
@@ -209,6 +206,6 @@ export default function Settings() {
           </label>
         </section>
       </div>
-    </animated.div>
+    </motion.div>
   )
 }
