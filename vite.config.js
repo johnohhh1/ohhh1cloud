@@ -6,16 +6,16 @@ export default defineConfig({
   server: {
     port: 8080
   },
-  define: {
-    'process.env': process.env
+  resolve: {
+    alias: {
+      'react': 'react',
+      'react-dom': 'react-dom'
+    }
   },
   build: {
     outDir: 'dist',
     rollupOptions: {
-      external: [
-        'react',
-        'react-dom'
-      ],
+      external: []
     },
   },
   base: './'
