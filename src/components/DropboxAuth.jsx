@@ -78,8 +78,9 @@ export default function DropboxAuth() {
     const authUrl = new URL('https://www.dropbox.com/oauth2/authorize');
     const params = new URLSearchParams({
       client_id: DROPBOX_CLIENT_ID,
-      response_type: 'token',
-      redirect_uri: `${window.location.origin}/auth/callback`
+      response_type: 'code',
+      redirect_uri: DROPBOX_REDIRECT_URI,
+      token_access_type: 'offline'
     });
     
     authUrl.search = params.toString();
