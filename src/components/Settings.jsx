@@ -228,8 +228,9 @@ export default function Settings() {
             <FaBell className="mr-2" /> Notifications
           </h3>
           <div className="space-y-4">
-            <label className="flex items-center p-2 cursor-pointer">
+            <label className="flex items-center p-2 cursor-pointer" htmlFor="notificationToggle">
               <input
+                id="notificationToggle"
                 type="checkbox"
                 checked={settings.notifications?.enabled}
                 onChange={(e) => updateSettings({ 
