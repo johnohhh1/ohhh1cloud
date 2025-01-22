@@ -121,4 +121,43 @@ export class DriveManager {
       return null;
     }
   }
+
+  async watchFolder(folderId, onNewImages, checkInterval = 30000) {
+    console.log('Started watching folder:', folderId);
+    let knownImages = new Set();
+    let isWatching = true;
+    
+    const checkForNewImages = async () => {
+      if (!isWatching) return;
+      
+      const currentImages = await this.getImagesFromFolder(folderId);
+      const newImages = currentImages.filter(img => !knownImages.has(img.id));
+      
+      if (newImages.length > 0) {
+        console.log(`Found ${newImages.length} new images`);
+        knownImages = new Set([...currentImages.map(img => img.id)]);
+        onNewImages(newImages);
+      }
+    };
+
+    await checkForNewImages();
+    const intervalId = setInterval(checkForNewImages, checkInterval);
+
+    return () => {
+      isWatching = false;
+      clearInterval(intervalId);
+      console.log('Stopped watching folder:', folderId);
+    };
+  }
+
+  async testNotification(onNewImages) {
+    const testImage = {
+      id: 'test-' + Date.now(),
+      name: 'Test Image',
+      mimeType: 'image/jpeg',
+      url: 'https://picsum.photos/800/600'  // Random test image
+    };
+    
+    onNewImages([testImage]);
+  }
 }

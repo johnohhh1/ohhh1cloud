@@ -5,14 +5,6 @@ import { FaGoogle, FaSpinner, FaFolder, FaTimes } from 'react-icons/fa';
 import { DriveManager } from '../services/driveService';
 import { motion } from 'framer-motion';
 
-// Safely import framer-motion to avoid deployment issues
-let AnimatePresence;
-try {
-  AnimatePresence = require('framer-motion').AnimatePresence;
-} catch (e) {
-  console.warn('Framer Motion not available', e);
-}
-
 export function GoogleDriveFolderDialog({ folders, isLoading, onDismiss, onFolderSelected }) {
   return (
     <motion.div
@@ -123,15 +115,15 @@ export default function GoogleDriveAuth() {
           {isLoading ? 'Connecting...' : 'Connect Google Drive'}
         </button>
       ) : (
-        AnimatePresence && (
-          <AnimatePresence>
+        motion.AnimatePresence && (
+          <motion.AnimatePresence>
             <GoogleDriveFolderDialog
               folders={folders}
               isLoading={isLoading}
               onDismiss={() => setShowFolderPicker(false)}
               onFolderSelected={handleFolderSelect}
             />
-          </AnimatePresence>
+          </motion.AnimatePresence>
         )
       )}
       {!accessToken && (

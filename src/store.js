@@ -22,27 +22,17 @@ const useStore = create(
           accessToken: null,
           selectedFolder: null,
           images: []
+        },
+        notifications: {
+          enabled: false,
+          sound: true,
+          volume: 0.5,
+          checkInterval: 30000
         }
       },
       
       setImages: (images) => set({ images, currentImage: images[0] }),
       
-      addGoogleDriveImages: (images) => {
-        console.log('Adding Google Drive images to store:', images);
-        set(state => {
-          const imageUrls = images.map(img => img.url);
-          console.log('Processed image URLs:', imageUrls);
-          const newState = {
-            images: [...state.images, ...imageUrls],
-            currentIndex: state.images.length === 0 ? 0 : state.currentIndex,
-            currentImage: state.images.length === 0 ? imageUrls[0] : state.currentImage,
-            transitionEffect: 1
-          };
-          console.log('New store state:', newState);
-          return newState;
-        });
-      },
-
       nextImage: () => {
         const { images, currentIndex, settings, slideTimer } = get()
         console.log('Next Image - Current state:', { 
@@ -170,6 +160,26 @@ const useStore = create(
             transitionEffect: 1
           };
           console.log('New store state:', newState);
+          return newState;
+        });
+      },
+
+      addNewImages: (images, source) => {
+        console.log(`Adding new images from ${source}:`, images);
+        set(state => {
+          const imageUrls = images.map(img => img.url);
+          
+          // Show newest if it's from any cloud source
+          const showNewest = images.length === 1 && 
+                            images[0].isNew && 
+                            ['googleDrive', 'dropbox'].includes(images[0].source);
+          
+          const newState = {
+            images: [...state.images, ...imageUrls],
+            currentIndex: showNewest ? state.images.length : state.currentIndex,
+            currentImage: showNewest ? imageUrls[0] : state.currentImage,
+            transitionEffect: 1
+          };
           return newState;
         });
       }

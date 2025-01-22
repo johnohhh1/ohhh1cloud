@@ -12,13 +12,16 @@ import {
   FaClock,
   FaImage,
   FaMagic,
-  FaExpand
+  FaExpand,
+  FaBell
 } from 'react-icons/fa'
+import { NotificationSound } from './NotificationSound'
 
 export default function Settings() {
-  const { settings, updateSettings, addLocalImages } = useStore()
+  const { settings, updateSettings, addLocalImages, addGoogleDriveImages, addNewImages } = useStore()
   const fileInputRef = React.useRef()
   const [isFullscreen, setIsFullscreen] = React.useState(false)
+  const [showNotification, setShowNotification] = React.useState(false)
 
   const handleFileSelect = (e) => {
     if (e.target.files?.length) {
@@ -52,6 +55,20 @@ export default function Settings() {
       })
     }
   }
+
+  const handleTestNotification = () => {
+    const testImage = { 
+      id: 'test-' + Date.now(),
+      name: 'Test Image',
+      url: 'https://picsum.photos/800/600',
+      isNew: true,
+      source: 'test'
+    };
+    addNewImages([testImage], 'test');
+    if (settings.notifications?.enabled) {
+      setShowNotification(true);
+    }
+  };
 
   React.useEffect(() => {
     const handleFullscreenChange = () => {
@@ -205,7 +222,80 @@ export default function Settings() {
             <span>Fullscreen Mode</span>
           </label>
         </section>
+
+        <section>
+          <h3 className="text-lg font-semibold mb-4 flex items-center">
+            <FaBell className="mr-2" /> Notifications
+          </h3>
+          <div className="space-y-4">
+            <label className="flex items-center p-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={settings.notifications?.enabled}
+                onChange={(e) => updateSettings({ 
+                  notifications: { 
+                    ...settings.notifications,
+                    enabled: e.target.checked 
+                  }
+                })}
+                className="mr-2"
+              />
+              <span>Enable New Image Notifications</span>
+            </label>
+            
+            {settings.notifications?.enabled && (
+              <>
+                <label className="flex items-center p-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.notifications?.sound}
+                    onChange={(e) => updateSettings({ 
+                      notifications: {
+                        ...settings.notifications,
+                        sound: e.target.checked
+                      }
+                    })}
+                    className="mr-2"
+                  />
+                  <span>Play Sound</span>
+                </label>
+                
+                <div className="flex items-center">
+                  <span className="mr-2">Volume:</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={settings.notifications?.volume || 0.5}
+                    onChange={(e) => updateSettings({
+                      notifications: {
+                        ...settings.notifications,
+                        volume: parseFloat(e.target.value)
+                      }
+                    })}
+                    className="w-full"
+                  />
+                </div>
+
+                <button
+                  onClick={handleTestNotification}
+                  className="w-full p-2 bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+                >
+                  Test Notification Sound
+                </button>
+              </>
+            )}
+          </div>
+        </section>
       </div>
+
+      {showNotification && settings.notifications?.sound && (
+        <NotificationSound 
+          onComplete={() => setShowNotification(false)}
+          volume={settings.notifications?.volume || 0.5}
+        />
+      )}
     </motion.div>
   )
 }

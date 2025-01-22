@@ -82,4 +82,42 @@ export class DropboxManager {
       return [];
     }
   }
+
+  async watchFolder(path, onNewImages, checkInterval = 30000) {
+    console.log('Started watching Dropbox folder:', path);
+    let knownImages = new Set();
+    let isWatching = true;
+    
+    // Initial load of images
+    const initialImages = await this.getFolderImages(path);
+    knownImages = new Set(initialImages.map(img => img.id));
+    console.log('Initial Dropbox images:', initialImages.length);
+    
+    const checkForNewImages = async () => {
+      if (!isWatching) return;
+      
+      try {
+        const currentImages = await this.getFolderImages(path);
+        const newImages = currentImages.filter(img => !knownImages.has(img.id));
+        
+        if (newImages.length > 0) {
+          console.log(`Found ${newImages.length} new Dropbox images:`, newImages);
+          knownImages = new Set(currentImages.map(img => img.id));
+          onNewImages(newImages);
+        }
+      } catch (error) {
+        console.error('Error checking for new Dropbox images:', error);
+      }
+    };
+
+    // Start polling
+    const intervalId = setInterval(checkForNewImages, checkInterval);
+    console.log('Started Dropbox polling with interval:', checkInterval);
+
+    return () => {
+      isWatching = false;
+      clearInterval(intervalId);
+      console.log('Stopped watching Dropbox folder:', path);
+    };
+  }
 } 
