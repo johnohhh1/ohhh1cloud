@@ -158,11 +158,10 @@ export default function DropboxAuth() {
         ) : !showFolderPicker ? (
           <button
             onClick={connectToDropbox}
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
-            aria-label="Connect to Dropbox"
+            className="w-full flex items-center justify-center gap-2"
           >
             <FaDropbox />
-            <span>Connect Dropbox</span>
+            Connect Dropbox
           </button>
         ) : (
           <DropboxFolderDialog
