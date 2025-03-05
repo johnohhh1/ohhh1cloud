@@ -10,6 +10,12 @@ export class ImageCache {
     if ('memory' in performance) {
       setInterval(() => this.checkMemoryPressure(), 1000);
     }
+
+    // Set automatic cleanup every 5 minutes
+    setInterval(() => this.cleanupMemory(), 5 * 60 * 1000); // Every 5 min
+
+    // Set automatic image refresh every 2 minutes
+    setInterval(() => this.refreshCachedImages(), 2 * 60 * 1000); // Every 2 min
   }
 
   calculateMaxMemory() {
@@ -28,19 +34,23 @@ export class ImageCache {
   }
 
   async cacheImage(url, options = {}) {
+    const cacheBusterUrl = `${url}?v=${Date.now()}`; // Forces fresh request
+
     // Check memory cache first
     if (this.memoryCache.has(url)) {
       const cached = this.memoryCache.get(url);
       cached.lastAccessed = Date.now();
-      return cached.url;
+      return cached.url; // Return existing cached version
     }
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(cacheBusterUrl, {
         ...options,
         headers: {
           ...options.headers,
-          'Cache-Control': 'max-age=3600'
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
         }
       });
 
@@ -93,7 +103,13 @@ export class ImageCache {
     }
   }
 
+  refreshCachedImages() {
+    console.log('Refreshing cached images...');
+    this.preloadImages([...this.memoryCache.keys()]); // Re-fetch images
+  }
+
   cleanupMemory() {
+    console.log('Cleaning up memory...');
     const entries = [...this.memoryCache.entries()]
       .sort(([, a], [, b]) => a.lastAccessed - b.lastAccessed);
 
