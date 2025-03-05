@@ -5,21 +5,20 @@ export class ImageCache {
     this.currentMemorySize = 0;
     this.preloadQueue = [];
     this.isPreloading = false;
-    
+
     // Monitor memory like your Android app
     if ('memory' in performance) {
       setInterval(() => this.checkMemoryPressure(), 1000);
     }
 
-    // Set automatic cleanup every 5 minutes
-    setInterval(() => this.cleanupMemory(), 5 * 60 * 1000); // Every 5 min
+    // Restore: Only cleanup when needed, no forced clearing
+    setInterval(() => this.cleanupMemory(), 5 * 60 * 1000); // Cleanup every 5 min
 
-    // Set automatic image refresh every 2 minutes
-    setInterval(() => this.refreshCachedImages(), 2 * 60 * 1000); // Every 2 min
+    // Restore: Periodic refresh without forcing cache busting
+    setInterval(() => this.refreshCachedImages(), 2 * 60 * 1000); // Refresh every 2 min
   }
 
   calculateMaxMemory() {
-    // Use 40% of available memory like your Android app
     if ('memory' in performance) {
       return Math.floor(performance.memory.jsHeapSizeLimit * 0.4);
     }
@@ -28,29 +27,25 @@ export class ImageCache {
 
   checkMemoryPressure() {
     const usedRatio = performance.memory.usedJSHeapSize / performance.memory.jsHeapSizeLimit;
-    if (usedRatio > 0.8) { // 80% memory usage
+    if (usedRatio > 0.8) {
       this.cleanupMemory();
     }
   }
 
   async cacheImage(url, options = {}) {
-    const cacheBusterUrl = `${url}?v=${Date.now()}`; // Forces fresh request
-
-    // Check memory cache first
     if (this.memoryCache.has(url)) {
       const cached = this.memoryCache.get(url);
       cached.lastAccessed = Date.now();
-      return cached.url; // Return existing cached version
+      return cached.url;
     }
 
     try {
-      const response = await fetch(cacheBusterUrl, {
+      // 🔄 **Restore Original Fetch Without Cache-Busting** 
+      const response = await fetch(url, {
         ...options,
         headers: {
           ...options.headers,
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
+          'Cache-Control': 'max-age=3600' // Restore original behavior
         }
       });
 
@@ -65,7 +60,6 @@ export class ImageCache {
         height: 0
       };
 
-      // Get image dimensions like Glide does
       const img = new Image();
       await new Promise((resolve, reject) => {
         img.onload = () => {
@@ -105,7 +99,7 @@ export class ImageCache {
 
   refreshCachedImages() {
     console.log('Refreshing cached images...');
-    this.preloadImages([...this.memoryCache.keys()]); // Re-fetch images
+    this.preloadImages([...this.memoryCache.keys()]); // ✅ Restore original image refresh method
   }
 
   cleanupMemory() {
