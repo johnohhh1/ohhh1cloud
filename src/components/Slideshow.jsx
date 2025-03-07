@@ -1,55 +1,68 @@
-import { useTransition, animated } from '@react-spring/web'
-import { useStore } from '../store'
-import { transitionStyles, defaultSpringConfig } from '../transitions';
-import { useEffect } from 'react'
+import { useTransition, animated } from "@react-spring/web";
+import { useStore } from "../store";
+import { transitionStyles } from "../transitions";
+import { useState, useEffect } from "react";
 
 export function Slideshow() {
-  const { currentImage, settings } = useStore()
+  const { images, settings } = useStore(); // Ensure images are fetched correctly
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentImage, setCurrentImage] = useState(images[0] || "");
 
-  // Debug logging
+  // Auto-cycle through images
   useEffect(() => {
-    console.log('Current transition:', settings.transition)
-    console.log('Duration:', settings.transitionDuration)
-  }, [settings.transition, settings.transitionDuration])
+    if (!images.length) return;
 
-  // Preload images
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, settings.transitionDuration * 1000);
+
+    return () => clearInterval(interval);
+  }, [images, settings.transitionDuration]);
+
+  // Update `currentImage` when `currentIndex` changes
   useEffect(() => {
-    if (currentImage) {
-      const img = new Image()
-      img.src = currentImage
+    if (images.length) {
+      setCurrentImage(`${images[currentIndex]}?t=${Date.now()}`); // Cache-busting
     }
-  }, [currentImage])
+  }, [currentIndex, images]);
+
+  // Debugging logs
+  useEffect(() => {
+    console.log("Current Image:", currentImage);
+    console.log("Transition:", settings.transition);
+    console.log("Duration:", settings.transitionDuration);
+  }, [currentImage, settings.transition, settings.transitionDuration]);
 
   const transitions = useTransition(currentImage, {
     ...(transitionStyles[settings.transition] || transitionStyles.fade),
-    config: { 
+    config: {
       duration: settings.transitionDuration * 1000,
       tension: 200,
-      friction: 20
-    }
-  })
+      friction: 20,
+    },
+  });
 
   return (
     <div className="relative w-full h-full overflow-hidden">
       {transitions((style, item) => (
-        <animated.div 
+        <animated.div
           style={{
             ...style,
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            willChange: 'transform, opacity'
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            willChange: "transform, opacity",
           }}
           className="absolute inset-0"
         >
-          <img 
-            src={item} 
+          <img
+            src={item}
             className="w-full h-full object-contain"
-            alt=""
+            alt="Recognition"
             draggable={false}
           />
         </animated.div>
       ))}
     </div>
-  )
-} 
+  );
+}
