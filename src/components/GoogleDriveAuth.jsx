@@ -78,23 +78,30 @@ export default function GoogleDriveAuth() {
   });
 
   React.useEffect(() => {
-    let cleanup = null;
+  let cleanup = null;
 
-    if (driveManager && settings.googleDrive?.selectedFolder) {
-      driveManager.watchFolder(
+  if (driveManager && settings.googleDrive?.selectedFolder?.id) {
+    driveManager
+      .watchFolder(
         settings.googleDrive.selectedFolder.id,
-        handleNewImages
-      ).then(stopWatchingFn => {
-        cleanup = stopWatchingFn;
-      });
-    }
+        handleNewImages,
+        10_000  // poll every 10 seconds
+      )
+      .then(stopFn => {
+        cleanup = stopFn;
+      })
+      .catch(err => console.error('watchFolder error', err));
+  }
 
-    return () => {
-      if (cleanup) {
-        cleanup();
-      }
-    };
-  }, [driveManager, settings.googleDrive?.selectedFolder]);
+  return () => {
+    if (cleanup) cleanup();
+  };
+}, [
+  driveManager,
+  settings.googleDrive?.selectedFolder?.id,
+  handleNewImages
+]);
+
 
   return (
     <>
