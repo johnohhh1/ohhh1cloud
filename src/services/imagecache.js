@@ -231,7 +231,7 @@ export class ImageCache {
           this.cleanupMemory();
         }
 
-        return thumbnailUrl || objectUrl;
+        return objectUrl;
       } catch (error) {
         if (controller.signal.aborted) {
           // do not count aborts as errors
