@@ -252,12 +252,24 @@ export class ImageCache {
         }
 
         return objectUrl;
-      } catch (error) {
-        if (controller.signal.aborted) throw error;
+            } catch (error) {
+        if (controller.signal.aborted) {
+          // do not count deliberate aborts as errors
+          throw error;
+        }
         this.metrics.errors++;
         console.error('cacheImage error:', error);
-        return url;
+
+        // If we have a previously cached blob URL, reuse it
+        const prev = this.memoryCache.get(url);
+        if (prev) {
+          return prev.url;
+        }
+
+        // Last resort: return a local placeholder so <img> doesn’t break
+        return '/images/placeholder.png';
       }
+
     })();
 
     this.pendingRequests.set(url, { promise: requestPromise, controller });
