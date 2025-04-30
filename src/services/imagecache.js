@@ -1,3 +1,45 @@
+// src/services/imageCache.js
+
+/**
+ * Scale a blob down to maxDim×maxDim (preserving aspect ratio).
+ * Returns the original blob if it’s already within the size limits.
+ * @param {Blob} blob 
+ * @param {number} maxDim 
+ * @returns {Promise<Blob>}
+ */
+async function downscaleBlob(blob, maxDim = 1920) {
+  const img = new Image();
+  const url = URL.createObjectURL(blob);
+  await new Promise((res, rej) => {
+    img.onload  = res;
+    img.onerror = rej;
+    img.src     = url;
+  });
+  URL.revokeObjectURL(url);
+
+  let { width, height } = img;
+  if (width <= maxDim && height <= maxDim) {
+    return blob;
+  }
+  if (width > height) {
+    height = Math.round((height * maxDim) / width);
+    width  = maxDim;
+  } else {
+    width  = Math.round((width * maxDim) / height);
+    height = maxDim;
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = width;
+  canvas.height = height;
+  canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+  // output as JPEG at 80% quality
+  return await new Promise(res =>
+    canvas.toBlob(res, 'image/jpeg', 0.8)
+  );
+}
+
 export class ImageCache {
   constructor() {
     this.memoryCache = new Map();
@@ -9,7 +51,7 @@ export class ImageCache {
 
     // Default caching policy
     this.defaultPolicy = {
-      ttl: 3 * 60 * 1000, // 2 minutes
+      ttl: 3 * 60 * 1000, // 3 minutes
       priority: 'normal', // normal, high, low
       retries: 3
     };
@@ -35,14 +77,14 @@ export class ImageCache {
       );
     }
 
-    // Cleanup every 5 minutes if needed
+    // Periodic cleanup
     this.intervals.push(
       setInterval(() => this.cleanupMemory(), 5 * 60 * 1000)
     );
 
-    // Periodic refresh: re-fetch only stale entries every 2 minutes
+    // Periodic refresh: re-fetch stale entries every 3 minutes
     this.intervals.push(
-      setInterval(() => this.refreshCachedImages(), 2 * 60 * 1000)
+      setInterval(() => this.refreshCachedImages(), 3 * 60 * 1000)
     );
   }
 
@@ -50,15 +92,10 @@ export class ImageCache {
    * Stop all background tasks and clear the cache.
    */
   shutdown() {
-    // clear intervals
     this.intervals.forEach(id => clearInterval(id));
     this.intervals = [];
-
-    // abort pending fetches
     this.pendingRequests.forEach(({ controller }) => controller.abort());
     this.pendingRequests.clear();
-
-    // clear all objectURLs
     this.clear();
   }
 
@@ -70,25 +107,19 @@ export class ImageCache {
   }
 
   checkMemoryPressure() {
-    const { usedJSHeapSize, jsHeapSizeLimit } = performance.memory || {};
+    const { usedJSHeapSize = 0, jsHeapSizeLimit = 1 } = performance.memory || {};
     const usedRatio = usedJSHeapSize / jsHeapSizeLimit;
     if (usedRatio > 0.8) {
       this.cleanupMemory();
     }
   }
 
-  /**
-   * Assign a custom caching policy for URLs containing a pattern.
-   */
   setPolicy(urlPattern, policy) {
     this.policies.set(urlPattern, { ...this.defaultPolicy, ...policy });
-    this.urlPolicyCache.clear(); // invalidate cache
-    return this; // chainable
+    this.urlPolicyCache.clear();
+    return this;
   }
 
-  /**
-   * Retrieve the policy for a given URL, with caching of lookups.
-   */
   getPolicy(url) {
     if (this.urlPolicyCache.has(url)) {
       return this.urlPolicyCache.get(url);
@@ -104,15 +135,12 @@ export class ImageCache {
     return matched;
   }
 
-  /**
-   * Fetch with retry logic, exponential backoff, and abort support.
-   */
   async fetchWithRetry(url, options = {}, retries = 3, baseDelay = 300) {
     const { signal, ...rest } = options;
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
         const response = await fetch(url, { ...rest, signal });
-        if (!response.ok) throw new Error(`Failed: ${response.status}`);
+        if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
         return response;
       } catch (err) {
         if (signal && signal.aborted) throw err;
@@ -123,16 +151,12 @@ export class ImageCache {
     }
   }
 
-  /**
-   * Generate a thumbnail objectURL for a blob.
-   */
   async generateThumbnail(blob, maxSize = 200) {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
+        let width = img.width, height = img.height;
         if (width > height && width > maxSize) {
           height = Math.round(height * (maxSize / width));
           width = maxSize;
@@ -142,8 +166,7 @@ export class ImageCache {
         }
         canvas.width = width;
         canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
         canvas.toBlob(th => resolve(URL.createObjectURL(th)), 'image/jpeg', 0.7);
       };
       img.onerror = reject;
@@ -151,14 +174,10 @@ export class ImageCache {
     });
   }
 
-  /**
-   * Cache and retrieve an image, with TTL, retries, dedupe, and metrics.
-   */
   async cacheImage(url, options = {}) {
-    // Abort any stale in-flight request
+    // Cancel any in-flight request for the same URL
     if (this.pendingRequests.has(url)) {
-      const { controller } = this.pendingRequests.get(url);
-      controller.abort();
+      this.pendingRequests.get(url).controller.abort();
       this.pendingRequests.delete(url);
     }
 
@@ -167,15 +186,15 @@ export class ImageCache {
       const policy = this.getPolicy(url);
       const now = Date.now();
 
-      // Hit
+      // HIT: return if within TTL
       if (this.memoryCache.has(url)) {
         const entry = this.memoryCache.get(url);
         entry.lastAccessed = now;
         if (now - entry.fetchedAt < policy.ttl) {
           this.metrics.hits++;
-          return entry.thumbnailUrl || entry.url;
+          return entry.url;
         }
-        // stale: revoke both URLs
+        // stale → revoke & remove
         URL.revokeObjectURL(entry.url);
         if (entry.thumbnailUrl) URL.revokeObjectURL(entry.thumbnailUrl);
         this.currentMemorySize -= entry.size;
@@ -186,20 +205,22 @@ export class ImageCache {
       }
 
       try {
-        const response = await this.fetchWithRetry(
+        // fetch raw blob
+        let blob = await (await this.fetchWithRetry(
           url,
           { ...options, cache: 'no-store', signal: controller.signal },
           policy.retries
-        );
-        const blob = await response.blob();
+        )).blob();
+
+        // downscale large images to max 1920px
+        blob = await downscaleBlob(blob, 1920);
+
         const objectUrl = URL.createObjectURL(blob);
 
-        // optional thumbnail
+        // optional thumbnail for UI (not returned)
         let thumbnailUrl = null;
         if (blob.size > 100 * 1024) {
-          try {
-            thumbnailUrl = await this.generateThumbnail(blob);
-          } catch {}
+          try { thumbnailUrl = await this.generateThumbnail(blob) } catch {}
         }
 
         // measure dimensions
@@ -207,12 +228,13 @@ export class ImageCache {
         try {
           const img = new Image();
           await new Promise((res, rej) => {
-            img.onload = () => { width = img.width; height = img.height; res(); };
+            img.onload  = () => { width = img.width; height = img.height; res() };
             img.onerror = rej;
-            img.src = objectUrl;
+            img.src     = objectUrl;
           });
         } catch {}
 
+        // cache entry
         const imageData = {
           url: objectUrl,
           thumbnailUrl,
@@ -223,21 +245,17 @@ export class ImageCache {
           height,
           priority: policy.priority
         };
-
         this.memoryCache.set(url, imageData);
         this.currentMemorySize += blob.size;
-
         if (this.currentMemorySize > this.maxMemorySize) {
           this.cleanupMemory();
         }
 
         return objectUrl;
       } catch (error) {
-        if (controller.signal.aborted) {
-          // do not count aborts as errors
-          throw error;
-        }
+        if (controller.signal.aborted) throw error;
         this.metrics.errors++;
+        console.error('cacheImage error:', error);
         return url;
       }
     })();
@@ -247,24 +265,18 @@ export class ImageCache {
     return requestPromise;
   }
 
-  /**
-   * Preload images sequentially in background
-   */
   async preloadImages(urls) {
     this.preloadQueue.push(...urls);
     if (!this.isPreloading) {
       this.isPreloading = true;
       while (this.preloadQueue.length) {
-        const nextUrl = this.preloadQueue.shift();
-        await this.cacheImage(nextUrl).catch(() => {});
+        const next = this.preloadQueue.shift();
+        await this.cacheImage(next).catch(() => {});
       }
       this.isPreloading = false;
     }
   }
 
-  /**
-   * Refresh only URLs whose TTL expired, batching to avoid spikes.
-   */
   async refreshCachedImages() {
     const now = Date.now();
     const stale = [];
@@ -272,16 +284,13 @@ export class ImageCache {
       const policy = this.getPolicy(url);
       if (now - entry.fetchedAt >= policy.ttl) stale.push(url);
     }
-    const batchSize = 5;
-    for (let i = 0; i < stale.length; i += batchSize) {
-      const batch = stale.slice(i, i + batchSize);
-      await Promise.allSettled(batch.map(u => this.cacheImage(u).catch(() => {})));
+    const batch = 5;
+    for (let i = 0; i < stale.length; i += batch) {
+      const slice = stale.slice(i, i + batch);
+      await Promise.allSettled(slice.map(u => this.cacheImage(u).catch(() => {})));
     }
   }
 
-  /**
-   * Cleanup based on priority + LRU until under memory threshold.
-   */
   cleanupMemory() {
     const entries = [...this.memoryCache.entries()]
       .sort(([, a], [, b]) => {
@@ -299,9 +308,6 @@ export class ImageCache {
     }
   }
 
-  /**
-   * Get snapshot of cache metrics
-   */
   getMetrics() {
     const total = this.metrics.hits + this.metrics.misses;
     const hitRate = total ? (this.metrics.hits / total) * 100 : 0;
@@ -317,9 +323,6 @@ export class ImageCache {
     };
   }
 
-  /**
-   * Clear all cached entries immediately.
-   */
   clear() {
     for (const entry of this.memoryCache.values()) {
       URL.revokeObjectURL(entry.url);
@@ -330,9 +333,6 @@ export class ImageCache {
     return this;
   }
 
-  /**
-   * Reset metrics counters and start time
-   */
   resetMetrics() {
     this.metrics = { hits: 0, misses: 0, refreshes: 0, errors: 0, startTime: Date.now() };
     return this;
