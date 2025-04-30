@@ -85,7 +85,7 @@ export default function GoogleDriveAuth() {
       .watchFolder(
         settings.googleDrive.selectedFolder.id,
         handleNewImages,
-        10_000  // poll every 10 seconds
+        180_000  // poll every 10 seconds
       )
       .then(stopFn => {
         cleanup = stopFn;
