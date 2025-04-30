@@ -9,7 +9,7 @@ export class ImageCache {
 
     // Default caching policy
     this.defaultPolicy = {
-      ttl: 2 * 60 * 1000, // 2 minutes
+      ttl: 3 * 60 * 1000, // 2 minutes
       priority: 'normal', // normal, high, low
       retries: 3
     };
