@@ -4,7 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google'
 import { FaGoogle, FaSpinner } from 'react-icons/fa'
 import { AnimatePresence, motion } from 'framer-motion'
-import NotificationSound from './NotificationSound'
+import { NotificationSound } from './NotificationSound'
+import { useStore } from '../store'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Environment variables (Vite)
