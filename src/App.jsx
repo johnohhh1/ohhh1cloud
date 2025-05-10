@@ -40,31 +40,31 @@ export default function App() {
       {/* ———————————————————————————————————————————————— */}
 
       {/* blurred background from currentImage */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center blur-xl opacity-50 scale-110"
-        style={{ backgroundImage: `url(${currentImage})` }}
+    <div 
+      className="absolute inset-0 bg-cover bg-center blur-xl opacity-50 scale-110"
+      style={{ backgroundImage: `url(${currentImage?.url})` }}
+    />
+    
+    <AnimatePresence mode="wait" initial={false} custom={transitionEffect}>
+      <motion.img
+        key={currentImage?.url}
+        src={currentImage?.url}
+        custom={transitionEffect}
+        variants={transitions[settings.transition]}
+        initial="enter"
+        animate="center"
+        exit="exit"
+        transition={{
+          duration: settings.transitionDuration || 0.8,
+          type: "spring",
+          stiffness: 200,
+          damping: 20,
+          opacity: { duration: 0.5 }
+        }}
+        className="absolute inset-0 w-full h-full object-contain"
       />
-      <div className="absolute inset-0 bg-black/30" />
-      
-      <AnimatePresence mode="wait" initial={false} custom={transitionEffect}>
-        <motion.img
-          key={currentImage}
-          src={currentImage}
-          custom={transitionEffect}
-          variants={transitions[settings.transition]}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          transition={{
-            duration: settings.transitionDuration || 0.8,
-            type: "spring",
-            stiffness: 200,
-            damping: 20,
-            opacity: { duration: 0.5 }
-          }}
-          className="absolute inset-0 w-full h-full object-contain"
-        />
-      </AnimatePresence>
+    </AnimatePresence>
+
       
       <div className="fixed top-4 right-4 z-50 flex gap-2">
         <button
