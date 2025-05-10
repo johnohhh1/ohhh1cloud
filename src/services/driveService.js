@@ -95,7 +95,11 @@ export class DriveManager {
       );
 
       console.log('Processed images:', images);
-      return images;
+      return images.map(img => ({
+        ...img,
+        isNew: true,
+        source: 'googleDrive'
+      }));
 
     } catch (error) {
       console.error(`Error getting images from folder ${folderId}:`, error);
