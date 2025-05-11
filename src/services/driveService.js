@@ -1,3 +1,4 @@
+// DriveManager.js
 export class DriveManager {
   constructor(accessToken) {
     if (!accessToken) {
@@ -72,7 +73,7 @@ export class DriveManager {
       console.log(`Found ${data.files.length} images in folder ${folderId}`);
 
       const images = data.files.map((file) => {
-        const directUrl = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media&access_token=${encodeURIComponent(this.accessToken)}`
+        const directUrl = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media&access_token=${encodeURIComponent(this.accessToken)}`;
         return {
           id: file.id,
           name: file.name,
@@ -147,3 +148,5 @@ export class DriveManager {
     onNewImages([testImage]);
   }
 }
+
+export default DriveManager;
