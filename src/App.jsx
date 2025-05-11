@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from './store'
 import Settings from './components/Settings'
 import Navigation from './components/Navigation'
-import GoogleDriveAuth from './components/GoogleDriveAuth'   // ← import it here
 import { FaCog, FaPlay, FaPause } from 'react-icons/fa'
 
 const transitions = {
@@ -32,12 +31,6 @@ export default function App() {
 
   return (
     <div className="h-screen w-screen bg-black text-white overflow-hidden relative">
-      
-      {/* ————————————— DRIVE AUTH PICKER ————————————— */}
-      <div className="absolute top-4 left-4 z-50">
-        <GoogleDriveAuth />
-      </div>
-      {/* ———————————————————————————————————————————————— */}
 
       {/* blurred background from currentImage */}
     <div 
