@@ -1,13 +1,10 @@
-import { ImageCache } from './imagecache';
-
 export class DriveManager {
   constructor(accessToken) {
     if (!accessToken) {
       throw new Error("Access token is required");
     }
     this.accessToken = accessToken;
-    this.imageCache = new ImageCache();
-    
+
     this.imageMimeTypes = [
       "image/jpeg",
       "image/png",
@@ -74,33 +71,19 @@ export class DriveManager {
 
       console.log(`Found ${data.files.length} images in folder ${folderId}`);
 
-      const images = await Promise.all(
-        data.files.map(async (file) => {
-          const imageUrl = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
+      const images = data.files.map((file) => {
+        const directUrl = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media&access_token=${encodeURIComponent(this.accessToken)}`
+        return {
+          id: file.id,
+          name: file.name,
+          mimeType: file.mimeType,
+          url: directUrl,
+          isNew: true,
+          source: 'googleDrive'
+        };
+      });
 
-          try {
-            const cachedUrl = await this.imageCache.cacheImage(imageUrl, {
-              headers: {
-                'Authorization': `Bearer ${this.accessToken}`
-              }
-            });
-
-            return {
-              id: file.id,
-              name: file.name,
-              mimeType: file.mimeType,
-              url: cachedUrl,
-              isNew: true,
-              source: 'googleDrive'
-            };
-          } catch (err) {
-            console.error(`Error caching image ${file.name}:`, err);
-            return null;
-          }
-        })
-      );
-
-      return images.filter(Boolean);
+      return images;
     } catch (error) {
       console.error(`Error getting images from folder ${folderId}:`, error);
       return [];
