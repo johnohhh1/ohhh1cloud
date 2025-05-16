@@ -1,6 +1,6 @@
 // src/App.jsx
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStore, getDisplayImageUrl } from './store'
 import Settings from './components/Settings'
@@ -22,7 +22,10 @@ export default function App() {
     slideTimer
   } = useStore()
 
-  // Get Google Drive token from settings
+  // Error state
+  const [globalError, setGlobalError] = useState(null);
+
+  // Get Google Drive token from settings (always fresh)
   const googleDriveToken = settings?.googleDrive?.accessToken;
 
   useEffect(() => {
@@ -32,11 +35,35 @@ export default function App() {
     }
   }, [settings.interval, settings.transition])
 
+  // If the current image is a Google Drive image and token is missing, show error
+  useEffect(() => {
+    if (currentImage && (currentImage.source === 'googleDrive' || (currentImage.url && currentImage.url.includes('googleapis.com/drive/v3/files')))) {
+      if (!googleDriveToken) {
+        setGlobalError('Google Drive access token is missing or expired. Please reconnect Google Drive.');
+      } else {
+        setGlobalError(null);
+      }
+    } else {
+      setGlobalError(null);
+    }
+  }, [currentImage, googleDriveToken]);
+
+  // Proxy error handler
+  const handleImgError = (e) => {
+    if (e?.target?.src && e.target.src.includes('/api/gdrive-proxy')) {
+      setGlobalError('Failed to load image from Google Drive. Your token may be expired or the file is not shared with your account. Try reconnecting Google Drive.');
+    }
+  };
+
   const displayUrl = getDisplayImageUrl(currentImage, googleDriveToken);
 
   return (
     <div className="h-screen w-screen bg-black text-white overflow-hidden relative">
-
+      {globalError && (
+        <div className="fixed top-0 left-0 w-full bg-red-700 text-white text-center py-4 z-50">
+          <b>Error:</b> {globalError}
+        </div>
+      )}
       {/* blurred background from currentImage */}
       <div 
         className="absolute inset-0 bg-cover bg-center blur-xl opacity-50 scale-110"
@@ -47,6 +74,7 @@ export default function App() {
         <motion.img
           key={displayUrl}
           src={displayUrl}
+          onError={handleImgError}
           custom={transitionEffect}
           variants={transitions[settings.transition]}
           initial="enter"
