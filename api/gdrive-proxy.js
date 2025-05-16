@@ -1,9 +1,10 @@
 // /api/gdrive-proxy.js
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Get fileId and token from query parameters
   const { fileId, token } = req.query;
   
   if (!fileId || !token) {
+    console.error('Missing parameters:', { fileId: !!fileId, token: !!token });
     return res.status(400).json({ error: 'Missing required parameters: fileId and token' });
   }
   
@@ -19,7 +20,13 @@ export default async function handler(req, res) {
     );
     
     if (!response.ok) {
-      throw new Error(`Google Drive API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error('Google Drive API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      });
+      throw new Error(`Google Drive API error: ${response.status} - ${response.statusText}`);
     }
     
     // Get content type from response headers
@@ -38,6 +45,9 @@ export default async function handler(req, res) {
     res.status(200).send(Buffer.from(buffer));
   } catch (error) {
     console.error('Error fetching Google Drive file:', error);
-    res.status(500).json({ error: 'Failed to fetch file from Google Drive' });
+    res.status(500).json({ 
+      error: 'Failed to fetch file from Google Drive',
+      details: error.message
+    });
   }
 }
