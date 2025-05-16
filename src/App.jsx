@@ -19,11 +19,13 @@ export default function App() {
     transitionEffect,
     startSlideshow,
     stopSlideshow,
-    slideTimer
+    slideTimer,
+    updateSettings
   } = useStore()
 
   // Error state
   const [globalError, setGlobalError] = useState(null);
+  const [showDebug, setShowDebug] = useState(false);
 
   // Get Google Drive token from settings (always fresh)
   const googleDriveToken = settings?.googleDrive?.accessToken;
@@ -57,11 +59,34 @@ export default function App() {
 
   const displayUrl = getDisplayImageUrl(currentImage, googleDriveToken);
 
+  // Reconnect Google Drive handler
+  const handleReconnect = () => {
+    updateSettings({
+      googleDrive: {
+        ...settings.googleDrive,
+        accessToken: null,
+        isConnected: false,
+        selectedFolder: null
+      }
+    });
+    window.location.reload();
+  };
+
   return (
     <div className="h-screen w-screen bg-black text-white overflow-hidden relative">
       {globalError && (
         <div className="fixed top-0 left-0 w-full bg-red-700 text-white text-center py-4 z-50">
           <b>Error:</b> {globalError}
+          <button onClick={handleReconnect} className="ml-4 px-4 py-2 bg-blue-600 rounded hover:bg-blue-800">Reconnect Google Drive</button>
+        </div>
+      )}
+      <button onClick={() => setShowDebug(d => !d)} className="fixed bottom-2 right-2 z-50 px-3 py-1 bg-gray-800 rounded text-xs">{showDebug ? 'Hide' : 'Show'} Debug</button>
+      {showDebug && (
+        <div className="fixed bottom-10 right-2 z-50 bg-black/80 text-white p-4 rounded shadow-lg text-xs max-w-md break-all">
+          <div><b>Google Drive Token:</b> {googleDriveToken || 'None'}</div>
+          <div><b>Current Image URL:</b> {displayUrl}</div>
+          <div><b>Current Image:</b> {JSON.stringify(currentImage)}</div>
+          <div><b>Last Error:</b> {globalError || 'None'}</div>
         </div>
       )}
       {/* blurred background from currentImage */}
