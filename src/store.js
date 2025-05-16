@@ -159,8 +159,16 @@ export { useStore }
 // Utility to get the correct image URL (proxy for Google Drive)
 export function getDisplayImageUrl(image, googleDriveToken) {
   if (!image) return '';
-  if (image.source === 'googleDrive' && image.id && googleDriveToken) {
-    return `/api/gdrive-proxy?fileId=${image.id}&token=${encodeURIComponent(googleDriveToken)}`;
+  // Force proxy for any Google Drive URL
+  const isGoogleDriveUrl = image.url && (
+    image.url.includes('googleapis.com/drive/v3/files') ||
+    image.url.includes('googleusercontent.com')
+  );
+  if ((image.source === 'googleDrive' || isGoogleDriveUrl) && image.id && googleDriveToken) {
+    const proxyUrl = `/api/gdrive-proxy?fileId=${image.id}&token=${encodeURIComponent(googleDriveToken)}`;
+    console.log('Using proxy for image:', proxyUrl);
+    return proxyUrl;
   }
+  console.log('Using direct url for image:', image.url);
   return image.url;
 }
