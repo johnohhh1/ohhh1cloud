@@ -1,0 +1,60 @@
+import { useState, useEffect } from 'react';
+import { DriveManager } from '../services/driveservice';
+
+const GoogleDriveSelector = ({ accessToken, onSelectFolder }) => {
+  const [folders, setFolders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!accessToken) return;
+    
+    const loadFolders = async () => {
+      setLoading(true);
+      try {
+        const manager = new DriveManager(accessToken);
+        const folderList = await manager.listFolders();
+        setFolders(folderList);
+      } catch (err) {
+        setError(`Error loading folders: ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadFolders();
+  }, [accessToken]);
+
+  const handleFolderSelect = (folderId) => {
+    if (onSelectFolder) {
+      onSelectFolder(folderId);
+    }
+  };
+
+  if (!accessToken) return null;
+
+  return (
+    <div className="folder-selector p-2">
+      {loading && <div>Loading folders...</div>}
+      {error && <div className="text-red-500">{error}</div>}
+      
+      {folders.length > 0 ? (
+        <div>
+          <h3 className="font-medium">Select a Google Drive folder:</h3>
+          <ul className="mt-2 space-y-1">
+            {folders.map(folder => (
+              <li key={folder.id} className="border rounded p-2 cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleFolderSelect(folder.id)}>
+                📁 {folder.name}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : !loading && !error ? (
+        <div>No folders found in your Google Drive</div>
+      ) : null}
+    </div>
+  );
+};
+
+export default GoogleDriveSelector;
