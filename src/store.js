@@ -164,11 +164,21 @@ export function getDisplayImageUrl(image, googleDriveToken) {
     image.url.includes('googleapis.com/drive/v3/files') ||
     image.url.includes('googleusercontent.com')
   );
-  if ((image.source === 'googleDrive' || isGoogleDriveUrl) && image.id && googleDriveToken) {
-    const proxyUrl = `/api/gdrive-proxy?fileId=${image.id}&token=${encodeURIComponent(googleDriveToken)}`;
-    console.log('Using proxy for image:', proxyUrl);
-    return proxyUrl;
+  if ((image.source === 'googleDrive' || isGoogleDriveUrl)) {
+    let fileId = image.id;
+    // Try to extract fileId from URL if not present
+    if (!fileId && image.url) {
+      const match = image.url.match(/\/files\/(.*?)\?/);
+      if (match && match[1]) fileId = match[1];
+    }
+    if (fileId && googleDriveToken) {
+      const proxyUrl = `/api/gdrive-proxy?fileId=${fileId}&token=${encodeURIComponent(googleDriveToken)}`;
+      console.log('Using proxy for image:', proxyUrl, image);
+      return proxyUrl;
+    } else {
+      console.warn('Google Drive image missing fileId or token:', image, googleDriveToken);
+    }
   }
-  console.log('Using direct url for image:', image.url);
+  console.log('Using direct url for image:', image.url, image);
   return image.url;
 }
