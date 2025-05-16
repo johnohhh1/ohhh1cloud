@@ -1,5 +1,5 @@
 import { useTransition, animated } from "@react-spring/web";
-import { useStore } from "../store";
+import { useStore, getDisplayImageUrl } from "../store";
 import { transitionStyles } from "../transitions";
 import { useState, useEffect } from "react";
 
@@ -7,6 +7,9 @@ export function Slideshow() {
   const { images, settings } = useStore(); // Ensure images are fetched correctly
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentImage, setCurrentImage] = useState(images[0] || "");
+
+  // Get Google Drive token from settings
+  const googleDriveToken = settings?.googleDrive?.accessToken;
 
   // Auto-cycle through images
   useEffect(() => {
@@ -22,7 +25,7 @@ export function Slideshow() {
   // Update `currentImage` when `currentIndex` changes
   useEffect(() => {
     if (images.length) {
-      setCurrentImage(`${images[currentIndex]}?t=${Date.now()}`); // Cache-busting
+      setCurrentImage(images[currentIndex]);
     }
   }, [currentIndex, images]);
 
@@ -56,7 +59,7 @@ export function Slideshow() {
           className="absolute inset-0"
         >
           <img
-            src={item}
+            src={getDisplayImageUrl(item, googleDriveToken)}
             className="w-full h-full object-contain"
             alt="Recognition"
             draggable={false}

@@ -155,3 +155,12 @@ const useStore = create(
 )
 
 export { useStore }
+
+// Utility to get the correct image URL (proxy for Google Drive)
+export function getDisplayImageUrl(image, googleDriveToken) {
+  if (!image) return '';
+  if (image.source === 'googleDrive' && image.id && googleDriveToken) {
+    return `/api/gdrive-proxy?fileId=${image.id}&token=${encodeURIComponent(googleDriveToken)}`;
+  }
+  return image.url;
+}

@@ -1,12 +1,14 @@
 import { useTransition, animated } from '@react-spring/web'
-import { useStore } from '../store'
+import { getDisplayImageUrl, useStore } from '../store'
 
 export function TestSlideshow() {
-  const { currentImage } = useStore()
+  const { currentImage, settings } = useStore()
+  const googleDriveToken = settings?.googleDrive?.accessToken
+  const displayUrl = getDisplayImageUrl(currentImage, googleDriveToken)
 
   console.log('Current image:', currentImage) // Debug log
 
-  const transitions = useTransition(currentImage, {
+  const transitions = useTransition(displayUrl, {
     from: { opacity: 0 },
     enter: { opacity: 1 },
     leave: { opacity: 0 },
