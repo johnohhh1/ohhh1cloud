@@ -1,5 +1,5 @@
 // /api/gdrive-proxy.js
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   // Get fileId and token from query parameters
   const { fileId, token } = req.query;
   
@@ -39,10 +39,10 @@ module.exports = async function handler(req, res) {
     res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
     
     // Get the file data as array buffer
-    const buffer = await response.arrayBuffer();
+    const buffer = Buffer.from(await response.arrayBuffer());
     
     // Send the file data
-    res.status(200).send(Buffer.from(buffer));
+    res.status(200).send(buffer);
   } catch (error) {
     console.error('Error fetching Google Drive file:', error);
     res.status(500).json({ 
