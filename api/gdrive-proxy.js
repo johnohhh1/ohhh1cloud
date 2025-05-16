@@ -1,5 +1,4 @@
-// api/gdrive-proxy.js
-
+// /api/gdrive-proxy.js
 export default async function handler(req, res) {
   // Get fileId and token from query parameters
   const { fileId, token } = req.query;
