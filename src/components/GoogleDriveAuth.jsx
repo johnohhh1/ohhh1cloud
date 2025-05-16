@@ -54,6 +54,13 @@ export default function GoogleDriveAuth() {
       setIsLoading(true);
       try {
         setAccessToken(tokenResponse.access_token);
+        updateSettings({
+          googleDrive: {
+            ...settings.googleDrive,
+            accessToken: tokenResponse.access_token,
+            isConnected: true
+          }
+        });
         const manager = new DriveManager(tokenResponse.access_token);
         setDriveManager(manager);
         const folderList = await manager.listFolders();
