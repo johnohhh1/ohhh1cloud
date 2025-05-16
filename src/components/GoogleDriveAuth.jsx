@@ -25,6 +25,7 @@ export default function GoogleDriveAuth() {
       addNewImages(images, 'googleDrive');
       updateSettings({
         googleDrive: {
+          ...settings.googleDrive,
           isConnected: true,
           selectedFolder: folder
         }
