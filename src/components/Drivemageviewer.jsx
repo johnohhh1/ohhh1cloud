@@ -12,10 +12,10 @@ const DriveImageViewer = () => {
   const [stopWatching, setStopWatching] = useState(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
 
-  // Client ID and API key from the Google API Console
-  // You'll need to replace these with your own credentials
-  const CLIENT_ID = '';
-  const API_KEY = '';
+  // Client ID and API key from environment variables
+  const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
+  const REDIRECT_URI = import.meta.env.VITE_GOOGLE_REDIRECT_URI;
   const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
   const SCOPES = 'https://www.googleapis.com/auth/drive.readonly';
 
