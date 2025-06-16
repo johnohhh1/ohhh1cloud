@@ -23,6 +23,12 @@ const useStore = create(
           selectedFolder: null,
           images: []
         },
+        googlePhotos: {
+          isConnected: false,
+          accessToken: null,
+          selectedAlbum: null,
+          images: []
+        },
         notifications: {
           enabled: false,
           sound: true,
@@ -122,11 +128,42 @@ const useStore = create(
         })
       },
 
+      addGooglePhotosImages: (images) => {
+        set(state => {
+          const allImages = [...state.images, ...images]
+          return {
+            images: allImages,
+            currentIndex: state.images.length === 0 ? 0 : state.currentIndex,
+            currentImage: state.images.length === 0 ? images[0] : state.currentImage,
+            transitionEffect: 1
+          }
+        })
+      },
+
+      loadGooglePhotosImages: (images) => {
+        set(state => {
+          const allImages = [...state.images, ...images]
+          return {
+            images: allImages,
+            currentIndex: state.images.length === 0 ? 0 : state.currentIndex,
+            currentImage: state.images.length === 0 ? images[0] : state.currentImage,
+            transitionEffect: 1,
+            settings: {
+              ...state.settings,
+              googlePhotos: {
+                ...state.settings.googlePhotos,
+                images
+              }
+            }
+          }
+        })
+      },
+
       addNewImages: (images, source) => {
         set(state => {
           const showNewest = images.length === 1 &&
             images[0].isNew &&
-            ['googleDrive', 'dropbox'].includes(images[0].source)
+            ['googleDrive', 'dropbox', 'googlePhotos'].includes(images[0].source)
 
           const allImages = [...state.images, ...images]
 
@@ -147,6 +184,10 @@ const useStore = create(
           googleDrive: {
             ...state.settings.googleDrive,
             images: [] // Avoid persisting
+          },
+          googlePhotos: {
+            ...state.settings.googlePhotos,
+            images: []
           }
         }
       })

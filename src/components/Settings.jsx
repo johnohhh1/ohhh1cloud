@@ -2,6 +2,7 @@ import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from '../store'
 import GoogleDriveAuth from './GoogleDriveAuth'
+import GooglePhotosAuth from './GooglePhotosAuth'
 import DropboxAuth from './DropboxAuth'
 import { 
   FaTimes, 
@@ -120,6 +121,7 @@ export default function Settings() {
             />
             
             <GoogleDriveAuth />
+            <GooglePhotosAuth />
             <DropboxAuth />
           </div>
         </section>

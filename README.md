@@ -6,6 +6,7 @@ A web-based digital photo frame application with cloud storage integration.
 
 - Slideshow functionality with customizable transitions
 - Google Drive integration
+- Google Photos integration
 - Dropbox integration
 - Local file support
 - Notification system for new images
@@ -26,8 +27,12 @@ npm install
 
 ```env
 VITE_GOOGLE_CLIENT_ID=your_google_client_id
+VITE_GOOGLE_PHOTOS_CLIENT_ID=your_google_photos_client_id
+VITE_GOOGLE_PHOTOS_API_KEY=your_google_photos_api_key
 VITE_DROPBOX_CLIENT_ID=your_dropbox_client_id
 ```
+
+Make sure the Google Photos Library API is enabled for your project.
 
 ## Development
 
