@@ -21,12 +21,12 @@ export default async function handler(req, res) {
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Google Drive API error:', {
+      return res.status(response.status).json({
+        error: 'Google Drive API error',
         status: response.status,
         statusText: response.statusText,
-        error: errorText
+        googleError: errorText
       });
-      throw new Error(`Google Drive API error: ${response.status} - ${response.statusText}`);
     }
     
     // Get content type from response headers
