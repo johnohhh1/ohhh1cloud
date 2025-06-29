@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useStore, getDisplayImageUrl } from './store'
 import Settings from './components/Settings'
 import Navigation from './components/Navigation'
-import { FaCog, FaPlay, FaPause, FaSpinner } from 'react-icons/fa'
+import { FaCog, FaPlay, FaPause } from 'react-icons/fa'
 
 const transitions = {
   fade: {
@@ -62,138 +62,59 @@ export default function App() {
     updateSettings
   } = useStore()
 
-  // Enhanced connection state management
-  const [connectionState, setConnectionState] = useState('connected'); // connected, reconnecting, failed
-  const [autoReconnectAttempts, setAutoReconnectAttempts] = useState(0);
+  // Simplified state management
+  const [globalError, setGlobalError] = useState(null);
   const [showDebug, setShowDebug] = useState(false);
   const [debugKeySequence, setDebugKeySequence] = useState([]);
-  const [lastSuccessfulConnection, setLastSuccessfulConnection] = useState(Date.now());
-  const [isAutoReconnecting, setIsAutoReconnecting] = useState(false);
+  const [lastTokenCheck, setLastTokenCheck] = useState(0);
 
   // Get Google Drive token from settings
   const googleDriveToken = settings?.googleDrive?.accessToken;
-  const hasGoogleDriveImages = settings?.googleDrive?.isConnected;
 
-  // Auto-reconnection system
-  const triggerAutoReconnect = async () => {
-    if (isAutoReconnecting || autoReconnectAttempts >= 3) {
-      return;
-    }
-
-    setIsAutoReconnecting(true);
-    setConnectionState('reconnecting');
-    setAutoReconnectAttempts(prev => prev + 1);
-
-    try {
-      // Trigger the Google OAuth flow programmatically
-      const { useGoogleLogin } = await import('@react-oauth/google');
-      
-      // Create a promise-based login
-      const loginPromise = new Promise((resolve, reject) => {
-        const login = useGoogleLogin({
-          onSuccess: (tokenResponse) => {
-            console.log('Auto-reconnect successful');
-            updateSettings({
-              googleDrive: {
-                ...settings.googleDrive,
-                accessToken: tokenResponse.access_token,
-                isConnected: true,
-                tokenExpiry: Date.now() + (55 * 60 * 1000),
-                lastConnection: Date.now()
-              }
-            });
-            setConnectionState('connected');
-            setAutoReconnectAttempts(0);
-            setLastSuccessfulConnection(Date.now());
-            setIsAutoReconnecting(false);
-            resolve(tokenResponse);
-          },
-          onError: (error) => {
-            console.error('Auto-reconnect failed:', error);
-            setConnectionState('failed');
-            setIsAutoReconnecting(false);
-            reject(error);
-          },
-          scope: 'https://www.googleapis.com/auth/drive.readonly',
-          flow: 'implicit'
-        });
-        
-        // Automatically trigger the login
-        setTimeout(() => login(), 1000);
-      });
-
-      await loginPromise;
-    } catch (error) {
-      console.error('Auto-reconnection failed:', error);
-      setConnectionState('failed');
-      setIsAutoReconnecting(false);
-      
-      // Retry after delay if we haven't hit max attempts
-      if (autoReconnectAttempts < 3) {
-        setTimeout(() => {
-          triggerAutoReconnect();
-        }, 30000 * autoReconnectAttempts); // Exponential backoff: 30s, 60s, 90s
-      }
-    }
-  };
-
-  // Enhanced token health monitoring
+  // Simplified, less aggressive token checking
   useEffect(() => {
     const checkTokenHealth = async () => {
-      if (!googleDriveToken || !hasGoogleDriveImages) return;
-
+      if (!googleDriveToken) return;
+      
+      // Only check every 5 minutes to avoid performance issues
+      const now = Date.now();
+      if (now - lastTokenCheck < 5 * 60 * 1000) return;
+      
       try {
         const response = await fetch('https://www.googleapis.com/drive/v3/about?fields=user', {
-          headers: {
-            'Authorization': `Bearer ${googleDriveToken}`
-          }
+          headers: { 'Authorization': `Bearer ${googleDriveToken}` }
         });
 
         if (response.status === 401) {
-          console.log('Token expired, triggering auto-reconnect...');
-          triggerAutoReconnect();
+          console.log('Google Drive token expired');
+          updateSettings({
+            googleDrive: {
+              ...settings.googleDrive,
+              accessToken: null,
+              isConnected: false
+            }
+          });
+          setGlobalError('Google Drive session expired. Please reconnect.');
         } else if (response.ok) {
-          setConnectionState('connected');
-          setAutoReconnectAttempts(0);
-          setLastSuccessfulConnection(Date.now());
+          setGlobalError(null);
         }
+        
+        setLastTokenCheck(now);
       } catch (error) {
         console.error('Token health check failed:', error);
-        // Don't immediately fail - could be temporary network issue
-        const timeSinceLastSuccess = Date.now() - lastSuccessfulConnection;
-        if (timeSinceLastSuccess > 10 * 60 * 1000) { // 10 minutes
-          triggerAutoReconnect();
-        }
       }
     };
 
-    // More frequent health checks
-    const healthCheckInterval = setInterval(checkTokenHealth, 2 * 60 * 1000); // Every 2 minutes
+    // Only run health checks every 5 minutes (instead of 2)
+    const healthCheckInterval = setInterval(checkTokenHealth, 5 * 60 * 1000);
     
-    // Initial check
+    // Initial check (but throttled)
     checkTokenHealth();
 
     return () => clearInterval(healthCheckInterval);
-  }, [googleDriveToken, hasGoogleDriveImages, lastSuccessfulConnection, autoReconnectAttempts]);
+  }, [googleDriveToken, settings.googleDrive, updateSettings, lastTokenCheck]);
 
-  // Preemptive token refresh (before expiry)
-  useEffect(() => {
-    if (!settings.googleDrive?.tokenExpiry) return;
-
-    const timeUntilExpiry = settings.googleDrive.tokenExpiry - Date.now();
-    const refreshTime = Math.max(timeUntilExpiry - (10 * 60 * 1000), 60000); // Refresh 10 min before expiry, but at least in 1 min
-
-    if (refreshTime > 0) {
-      const refreshTimer = setTimeout(() => {
-        console.log('Preemptively refreshing token before expiry...');
-        triggerAutoReconnect();
-      }, refreshTime);
-
-      return () => clearTimeout(refreshTimer);
-    }
-  }, [settings.googleDrive?.tokenExpiry]);
-
-  // Debug mode activation via key sequence
+  // Debug mode activation (unchanged)
   useEffect(() => {
     const handleKeyDown = (e) => {
       const key = e.key.toLowerCase();
@@ -218,7 +139,7 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [debugKeySequence]);
 
-  // Clear debug sequence after 3 seconds of inactivity
+  // Clear debug sequence after 3 seconds
   useEffect(() => {
     if (debugKeySequence.length > 0) {
       const timeout = setTimeout(() => setDebugKeySequence([]), 3000);
@@ -226,6 +147,7 @@ export default function App() {
     }
   }, [debugKeySequence]);
 
+  // Slideshow management
   useEffect(() => {
     if (settings.interval) {
       startSlideshow()
@@ -233,74 +155,81 @@ export default function App() {
     }
   }, [settings.interval, settings.transition])
 
-  // Enhanced error handler for images
+  // Enhanced error detection for Google Drive
+  useEffect(() => {
+    if (currentImage && (currentImage.source === 'googleDrive' || (currentImage.url && currentImage.url.includes('googleapis.com/drive/v3/files')))) {
+      if (!googleDriveToken) {
+        setGlobalError('Google Drive access token is missing or expired. Please reconnect Google Drive.');
+      } else {
+        setGlobalError(null);
+      }
+    } else {
+      setGlobalError(null);
+    }
+  }, [currentImage, googleDriveToken]);
+
+  // Simple error handler
   const handleImgError = (e) => {
     if (e?.target?.src && e.target.src.includes('/api/gdrive-proxy')) {
-      console.error('Google Drive image load failed, triggering reconnect');
-      triggerAutoReconnect();
+      setGlobalError('Failed to load image from Google Drive. Please check your connection.');
     }
   };
 
   const displayUrl = getDisplayImageUrl(currentImage, googleDriveToken);
 
-  // Manual reconnect as fallback
-  const handleManualReconnect = () => {
-    setAutoReconnectAttempts(0); // Reset attempts
-    updateSettings({ isOpen: true }); // Open settings
+  // Manual reconnect handler
+  const handleReconnect = () => {
+    updateSettings({
+      googleDrive: {
+        ...settings.googleDrive,
+        accessToken: null,
+        isConnected: false,
+        selectedFolder: null
+      }
+    });
+    setGlobalError(null);
+    updateSettings({ isOpen: true });
   };
 
-  // Get appropriate status message and styling
-  const getConnectionBanner = () => {
-    if (!hasGoogleDriveImages) return null;
-
-    switch (connectionState) {
-      case 'reconnecting':
-        return {
-          message: `Reconnecting to Google Drive... (attempt ${autoReconnectAttempts}/3)`,
-          className: 'bg-yellow-600',
-          showButton: false,
-          icon: <FaSpinner className="animate-spin" />
-        };
-      case 'failed':
-        return {
-          message: `Auto-reconnect failed. Manual reconnection required.`,
-          className: 'bg-red-700',
-          showButton: true,
-          icon: '⚠️'
-        };
-      default:
-        return null;
+  // Auto-dismiss errors after 10 seconds
+  useEffect(() => {
+    if (globalError) {
+      const timer = setTimeout(() => setGlobalError(null), 10000);
+      return () => clearTimeout(timer);
     }
-  };
-
-  const connectionBanner = getConnectionBanner();
+  }, [globalError]);
 
   return (
     <div className="h-screen w-screen bg-black text-white overflow-hidden relative">
-      {/* Smart connection banner - only shows when needed */}
-      {connectionBanner && (
+      {/* Simple error banner */}
+      {globalError && (
         <motion.div 
           initial={{ y: -100 }}
           animate={{ y: 0 }}
           exit={{ y: -100 }}
-          className={`fixed top-0 left-0 w-full text-white text-center py-4 z-50 ${connectionBanner.className}`}
+          className="fixed top-0 left-0 w-full bg-red-700 text-white text-center py-4 z-50"
         >
           <div className="flex items-center justify-center gap-4">
-            {connectionBanner.icon}
-            <span><b>Status:</b> {connectionBanner.message}</span>
-            {connectionBanner.showButton && (
+            <span><b>Error:</b> {globalError}</span>
+            {globalError.includes('Google Drive') && (
               <button 
-                onClick={handleManualReconnect} 
+                onClick={handleReconnect} 
                 className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-800 transition-colors"
               >
-                Open Settings
+                Reconnect
               </button>
             )}
+            <button 
+              onClick={() => setGlobalError(null)}
+              className="px-3 py-1 text-sm hover:bg-red-800 rounded transition-colors"
+            >
+              ✕
+            </button>
           </div>
         </motion.div>
       )}
 
-      {/* Debug panel - only shown when activated via key sequence */}
+      {/* Lightweight debug panel */}
       {showDebug && (
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
@@ -318,13 +247,12 @@ export default function App() {
             </button>
           </div>
           <div className="space-y-1 break-all">
-            <div><b>Connection State:</b> {connectionState}</div>
-            <div><b>Auto-reconnect Attempts:</b> {autoReconnectAttempts}/3</div>
             <div><b>Google Drive Token:</b> {googleDriveToken ? 'Connected' : 'None'}</div>
-            <div><b>Token Expiry:</b> {settings.googleDrive?.tokenExpiry ? new Date(settings.googleDrive.tokenExpiry).toLocaleTimeString() : 'None'}</div>
-            <div><b>Last Successful:</b> {new Date(lastSuccessfulConnection).toLocaleTimeString()}</div>
-            <div><b>Current Image:</b> {currentImage?.name || 'None'}</div>
+            <div><b>Current Image URL:</b> {displayUrl}</div>
+            <div><b>Current Image Source:</b> {currentImage?.source || 'None'}</div>
+            <div><b>Last Error:</b> {globalError || 'None'}</div>
             <div><b>Images Count:</b> {useStore.getState().images.length}</div>
+            <div><b>Last Token Check:</b> {lastTokenCheck ? new Date(lastTokenCheck).toLocaleTimeString() : 'Never'}</div>
           </div>
           <div className="mt-2 text-gray-400">
             Tip: Use Ctrl+Shift+D+E+B+U+G to toggle debug mode
