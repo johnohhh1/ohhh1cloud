@@ -30,11 +30,52 @@ export default function Settings() {
   }
 
   const transitionOptions = [
+    // Existing transitions
     { value: 'fade', label: 'Fade' },
     { value: 'slide-left', label: 'Slide Left' },
     { value: 'slide-up', label: 'Slide Up' },
     { value: 'zoom-in', label: 'Zoom In' },
-    { value: 'zoom-out', label: 'Zoom Out' }
+    { value: 'zoom-out', label: 'Zoom Out' },
+    { value: 'fade-up', label: 'Fade Up' },
+    { value: 'fade-down', label: 'Fade Down' },
+    { value: 'push', label: 'Push' },
+    
+    // 3D Transitions
+    { value: 'flip-horizontal', label: '3D Flip Horizontal' },
+    { value: 'flip-vertical', label: '3D Flip Vertical' },
+    { value: 'cube-left', label: '3D Cube Left' },
+    { value: 'cube-up', label: '3D Cube Up' },
+    { value: 'carousel', label: '3D Carousel' },
+    
+    // Artistic Transitions
+    { value: 'dissolve', label: 'Dissolve' },
+    { value: 'paint-brush', label: 'Paint Brush' },
+    { value: 'pixelate', label: 'Pixelate' },
+    { value: 'glitch', label: 'Glitch' },
+    
+    // Nature-Inspired
+    { value: 'wave', label: 'Wave' },
+    { value: 'ripple', label: 'Ripple' },
+    { value: 'leaf-turn', label: 'Leaf Turn' },
+    { value: 'wind-blow', label: 'Wind Blow' },
+    
+    // Geometric
+    { value: 'shatter', label: 'Shatter' },
+    { value: 'diamond-wipe', label: 'Diamond Wipe' },
+    { value: 'kaleidoscope', label: 'Kaleidoscope' },
+    { value: 'mosaic', label: 'Mosaic' },
+    
+    // Cinematic
+    { value: 'film-strip', label: 'Film Strip' },
+    { value: 'lens-focus', label: 'Lens Focus' },
+    { value: 'camera-flash', label: 'Camera Flash' },
+    { value: 'zoom-blur', label: 'Zoom Blur' },
+    
+    // Advanced Creative
+    { value: 'portal', label: 'Portal' },
+    { value: 'matrix-slide', label: 'Matrix Slide' },
+    { value: 'hologram', label: 'Hologram' },
+    { value: 'time-warp', label: 'Time Warp' }
   ]
 
   const transitionSpeeds = [

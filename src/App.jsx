@@ -9,6 +9,7 @@ import { DriveManager } from './services/driveService'
 import { FaCog, FaPlay, FaPause } from 'react-icons/fa'
 
 const transitions = {
+  // EXISTING TRANSITIONS
   fade: {
     enter: { opacity: 0 },
     center: { opacity: 1 },
@@ -48,6 +49,143 @@ const transitions = {
     enter: { x: '100%', opacity: 0 },
     center: { x: 0, opacity: 1 },
     exit: { x: '-50%', opacity: 0 }
+  },
+  
+  // 3D TRANSITIONS
+  'flip-horizontal': {
+    enter: { rotateY: -180, opacity: 0, transformOrigin: 'center' },
+    center: { rotateY: 0, opacity: 1, transformOrigin: 'center' },
+    exit: { rotateY: 180, opacity: 0, transformOrigin: 'center' }
+  },
+  'flip-vertical': {
+    enter: { rotateX: -180, opacity: 0, transformOrigin: 'center' },
+    center: { rotateX: 0, opacity: 1, transformOrigin: 'center' },
+    exit: { rotateX: 180, opacity: 0, transformOrigin: 'center' }
+  },
+  'cube-left': {
+    enter: { rotateY: 90, x: '50%', opacity: 0, transformOrigin: 'left center' },
+    center: { rotateY: 0, x: 0, opacity: 1, transformOrigin: 'left center' },
+    exit: { rotateY: -90, x: '-50%', opacity: 0, transformOrigin: 'left center' }
+  },
+  'cube-up': {
+    enter: { rotateX: 90, y: '50%', opacity: 0, transformOrigin: 'center top' },
+    center: { rotateX: 0, y: 0, opacity: 1, transformOrigin: 'center top' },
+    exit: { rotateX: -90, y: '-50%', opacity: 0, transformOrigin: 'center top' }
+  },
+  'carousel': {
+    enter: { rotateY: -45, scale: 0.8, x: '100%', opacity: 0 },
+    center: { rotateY: 0, scale: 1, x: 0, opacity: 1 },
+    exit: { rotateY: 45, scale: 0.8, x: '-100%', opacity: 0 }
+  },
+  
+  // ARTISTIC TRANSITIONS  
+  'dissolve': {
+    enter: { opacity: 0, filter: 'blur(10px)', scale: 1.1 },
+    center: { opacity: 1, filter: 'blur(0px)', scale: 1 },
+    exit: { opacity: 0, filter: 'blur(10px)', scale: 0.9 }
+  },
+  'paint-brush': {
+    enter: { opacity: 0, clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)' },
+    center: { opacity: 1, clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' },
+    exit: { opacity: 0, clipPath: 'polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)' }
+  },
+  'pixelate': {
+    enter: { opacity: 0, filter: 'blur(20px)', scale: 0.8 },
+    center: { opacity: 1, filter: 'blur(0px)', scale: 1 },
+    exit: { opacity: 0, filter: 'blur(20px)', scale: 1.2 }
+  },
+  'glitch': {
+    enter: { opacity: 0, x: -20, skew: -5 },
+    center: { opacity: 1, x: 0, skew: 0 },
+    exit: { opacity: 0, x: 20, skew: 5 }
+  },
+  
+  // NATURE-INSPIRED TRANSITIONS
+  'wave': {
+    enter: { opacity: 0, clipPath: 'polygon(0% 50%, 0% 50%, 0% 50%, 0% 50%)' },
+    center: { opacity: 1, clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' },
+    exit: { opacity: 0, clipPath: 'polygon(100% 50%, 100% 50%, 100% 50%, 100% 50%)' }
+  },
+  'ripple': {
+    enter: { opacity: 0, scale: 0, borderRadius: '50%' },
+    center: { opacity: 1, scale: 1, borderRadius: '0%' },
+    exit: { opacity: 0, scale: 2, borderRadius: '50%' }
+  },
+  'leaf-turn': {
+    enter: { opacity: 0, rotateZ: -45, scale: 0.5, transformOrigin: 'top left' },
+    center: { opacity: 1, rotateZ: 0, scale: 1, transformOrigin: 'top left' },
+    exit: { opacity: 0, rotateZ: 45, scale: 0.5, transformOrigin: 'bottom right' }
+  },
+  'wind-blow': {
+    enter: { opacity: 0, x: -100, skew: -10, filter: 'blur(5px)' },
+    center: { opacity: 1, x: 0, skew: 0, filter: 'blur(0px)' },
+    exit: { opacity: 0, x: 100, skew: 10, filter: 'blur(5px)' }
+  },
+  
+  // GEOMETRIC TRANSITIONS
+  'shatter': {
+    enter: { opacity: 0, scale: 0.3, rotate: -30 },
+    center: { opacity: 1, scale: 1, rotate: 0 },
+    exit: { opacity: 0, scale: 0.3, rotate: 30 }
+  },
+  'diamond-wipe': {
+    enter: { opacity: 0, clipPath: 'polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)' },
+    center: { opacity: 1, clipPath: 'polygon(0% 50%, 50% 0%, 100% 50%, 50% 100%)' },
+    exit: { opacity: 1, clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' }
+  },
+  'kaleidoscope': {
+    enter: { opacity: 0, rotate: -180, scale: 0.5, filter: 'hue-rotate(180deg)' },
+    center: { opacity: 1, rotate: 0, scale: 1, filter: 'hue-rotate(0deg)' },
+    exit: { opacity: 0, rotate: 180, scale: 0.5, filter: 'hue-rotate(-180deg)' }
+  },
+  'mosaic': {
+    enter: { opacity: 0, scale: 0.1, rotate: 45 },
+    center: { opacity: 1, scale: 1, rotate: 0 },
+    exit: { opacity: 0, scale: 0.1, rotate: -45 }
+  },
+  
+  // CINEMATIC TRANSITIONS
+  'film-strip': {
+    enter: { opacity: 0, scaleX: 0, transformOrigin: 'left center' },
+    center: { opacity: 1, scaleX: 1, transformOrigin: 'left center' },
+    exit: { opacity: 0, scaleX: 0, transformOrigin: 'right center' }
+  },
+  'lens-focus': {
+    enter: { opacity: 0, scale: 2, filter: 'blur(20px)' },
+    center: { opacity: 1, scale: 1, filter: 'blur(0px)' },
+    exit: { opacity: 0, scale: 0.5, filter: 'blur(20px)' }
+  },
+  'camera-flash': {
+    enter: { opacity: 0, scale: 0.8, filter: 'brightness(3) saturate(0)' },
+    center: { opacity: 1, scale: 1, filter: 'brightness(1) saturate(1)' },
+    exit: { opacity: 0, scale: 1.2, filter: 'brightness(3) saturate(0)' }
+  },
+  'zoom-blur': {
+    enter: { opacity: 0, scale: 0.3, filter: 'blur(10px)' },
+    center: { opacity: 1, scale: 1, filter: 'blur(0px)' },
+    exit: { opacity: 0, scale: 3, filter: 'blur(10px)' }
+  },
+  
+  // ADVANCED CREATIVE TRANSITIONS  
+  'portal': {
+    enter: { opacity: 0, scale: 0, rotate: 180, borderRadius: '50%' },
+    center: { opacity: 1, scale: 1, rotate: 0, borderRadius: '0%' },
+    exit: { opacity: 0, scale: 0, rotate: -180, borderRadius: '50%' }
+  },
+  'matrix-slide': {
+    enter: { opacity: 0, x: '100%', filter: 'hue-rotate(120deg) contrast(1.5)' },
+    center: { opacity: 1, x: 0, filter: 'hue-rotate(0deg) contrast(1)' },
+    exit: { opacity: 0, x: '-100%', filter: 'hue-rotate(-120deg) contrast(1.5)' }
+  },
+  'hologram': {
+    enter: { opacity: 0, scaleY: 0, filter: 'hue-rotate(180deg)', transformOrigin: 'center bottom' },
+    center: { opacity: 1, scaleY: 1, filter: 'hue-rotate(0deg)', transformOrigin: 'center bottom' },
+    exit: { opacity: 0, scaleY: 0, filter: 'hue-rotate(-180deg)', transformOrigin: 'center top' }
+  },
+  'time-warp': {
+    enter: { opacity: 0, scale: 0.1, rotate: -360, filter: 'blur(20px)' },
+    center: { opacity: 1, scale: 1, rotate: 0, filter: 'blur(0px)' },
+    exit: { opacity: 0, scale: 0.1, rotate: 360, filter: 'blur(20px)' }
   }
 }
 
@@ -78,51 +216,12 @@ export default function App() {
   const googleDriveConnected = settings?.googleDrive?.isConnected;
   const googleDriveFolder = settings?.googleDrive?.selectedFolder;
 
-  // Simplified, less aggressive token checking
-  useEffect(() => {
-    const checkTokenHealth = async () => {
-      if (!googleDriveToken) return;
-      
-      // Only check every 5 minutes to avoid performance issues
-      const now = Date.now();
-      if (now - lastTokenCheck < 5 * 60 * 1000) return;
-      
-      try {
-        const response = await fetch('https://www.googleapis.com/drive/v3/about?fields=user', {
-          headers: { 'Authorization': `Bearer ${googleDriveToken}` }
-        });
-
-        if (response.status === 401) {
-          console.log('Google Drive token expired');
-          updateSettings({
-            googleDrive: {
-              ...settings.googleDrive,
-              accessToken: null,
-              isConnected: false
-            }
-          });
-          setGlobalError('Google Drive session expired. Please reconnect.');
-        } else if (response.ok) {
-          setGlobalError(null);
-        }
-        
-        setLastTokenCheck(now);
-      } catch (error) {
-        console.error('Token health check failed:', error);
-      }
-    };
-
-    // Only run health checks every 5 minutes (instead of 2)
-    const healthCheckInterval = setInterval(checkTokenHealth, 5 * 60 * 1000);
-    
-    // Initial check (but throttled)
-    checkTokenHealth();
-
-    return () => clearInterval(healthCheckInterval);
-  }, [googleDriveToken, settings.googleDrive, updateSettings, lastTokenCheck]);
+  // Remove aggressive token checking that causes false expiration errors
+  // The service account tokens are managed by the backend and refreshed automatically
 
   // Track if we've initialized the service account
   const serviceAccountInitialized = useRef(false);
+  const tokenRefreshInterval = useRef(null);
 
   // Persistent Google Drive Authentication and Connection Management
   useEffect(() => {
@@ -189,19 +288,36 @@ export default function App() {
         
         console.log('🤖 Service account authentication complete!');
         setGlobalError(null);
+        return true;
         
       } catch (error) {
         console.error('🚨 Service account auth failed:', error);
         // Don't show error in UI for initial connection attempts
         // The app can still work with manual OAuth
+        return false;
       }
     };
 
-    // Try service account authentication only once if configured
+    // Try service account authentication if configured
     if (import.meta.env.VITE_GOOGLE_DRIVE_FOLDER_ID || import.meta.env.VITE_USE_SERVICE_ACCOUNT) {
       serviceAccountInitialized.current = true;
+      
+      // Initial authentication
       authenticateWithServiceAccount();
+      
+      // Set up token refresh every 58 minutes (tokens last 60 minutes)
+      tokenRefreshInterval.current = setInterval(() => {
+        console.log('🔄 Refreshing service account token...');
+        authenticateWithServiceAccount();
+      }, 58 * 60 * 1000);
     }
+    
+    // Cleanup function
+    return () => {
+      if (tokenRefreshInterval.current) {
+        clearInterval(tokenRefreshInterval.current);
+      }
+    };
   }, []); // Empty dependency array - run only once
 
   // Maintain existing token-based connection
@@ -433,26 +549,35 @@ export default function App() {
       />
       
       {/* Main image display */}
-      <AnimatePresence mode="wait" initial={false} custom={transitionEffect}>
-        <motion.img
-          key={displayUrl}
-          src={displayUrl}
-          onError={handleImgError}
-          custom={transitionEffect}
-          variants={transitions[settings.transition] || transitions.fade}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          transition={{
-            duration: settings.transitionDuration || 0.8,
-            type: "spring",
-            stiffness: 200,
-            damping: 20,
-            opacity: { duration: 0.5 }
-          }}
-          className="absolute inset-0 w-full h-full object-contain"
-        />
-      </AnimatePresence>
+      <div className="slideshow-container">
+        <AnimatePresence mode="wait" initial={false} custom={transitionEffect}>
+          <motion.img
+            key={displayUrl}
+            src={displayUrl}
+            onError={handleImgError}
+            custom={transitionEffect}
+            variants={transitions[settings.transition] || transitions.fade}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              duration: settings.transitionDuration || 0.8,
+              type: settings.transition?.includes('3d') || settings.transition?.includes('flip') || settings.transition?.includes('cube') || settings.transition?.includes('carousel') ? "spring" : "tween",
+              stiffness: 200,
+              damping: 20,
+              opacity: { duration: settings.transitionDuration ? settings.transitionDuration * 0.6 : 0.5 },
+              filter: { duration: settings.transitionDuration || 0.8 },
+              clipPath: { duration: settings.transitionDuration || 0.8, ease: "easeInOut" },
+              borderRadius: { duration: settings.transitionDuration || 0.8, ease: "easeInOut" }
+            }}
+            className="absolute inset-0 w-full h-full object-contain transition-gpu"
+            style={{
+              transformStyle: 'preserve-3d',
+              backfaceVisibility: 'hidden'
+            }}
+          />
+        </AnimatePresence>
+      </div>
 
       {/* Control buttons */}
       <div className="fixed top-4 right-4 z-50 flex gap-2">
