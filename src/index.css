@@ -1,0 +1,235 @@
+/* Tailwind Directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Base Styles */
+@layer base {
+  :root {
+    --transition-duration: 1000ms;
+  }
+
+  body {
+    @apply m-0 min-w-[320px] min-h-screen bg-black text-white;
+  }
+}
+
+/* Custom Components */
+@layer components {
+  /* Container & Base Styles */
+  .slideshow-container {
+    @apply fixed inset-0 w-screen h-screen overflow-hidden bg-black;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+  }
+
+  .slide {
+    @apply absolute inset-0 w-full h-full object-contain bg-transparent;
+  }
+
+  /* 3D Transform Utilities */
+  .perspective-1000 {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+  }
+
+  .motion-div {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    will-change: transform, opacity;
+  }
+
+  /* Settings Panel */
+  .settings-panel {
+    @apply fixed top-0 right-0 w-80 h-full bg-gray-900 p-6 shadow-lg z-40 overflow-y-auto;
+  }
+
+  /* Navigation Controls */
+  .nav-controls {
+    @apply fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30;
+  }
+
+  .nav-button {
+    @apply p-2 hover:bg-white/10 rounded-full transition-colors;
+  }
+
+  /* Glitch Effect Core */
+  .glitch-container {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .glitch-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    will-change: transform, opacity, filter;
+  }
+
+  .glitch-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* RGB Split Effects */
+  .glitch-image-main {
+    z-index: 2;
+  }
+
+  .glitch-image-r {
+    z-index: 3;
+    animation: glitch-anim-1 2s infinite linear alternate-reverse;
+    filter: drop-shadow(2px 0 #ff00ff) contrast(150%);
+  }
+
+  .glitch-image-g {
+    z-index: 4;
+    animation: glitch-anim-2 3s infinite linear alternate-reverse;
+    filter: drop-shadow(-2px 0 #00ffff) contrast(150%);
+  }
+
+  .glitch-overlay-red {
+    mix-blend-mode: screen;
+    filter: brightness(2) contrast(200%) hue-rotate(-45deg) saturate(150%);
+    opacity: 0.5;
+  }
+
+  .glitch-overlay-blue {
+    mix-blend-mode: screen;
+    filter: brightness(2) contrast(200%) hue-rotate(45deg) saturate(150%);
+    opacity: 0.5;
+  }
+
+  /* Glitch Animations */
+  @keyframes glitch-anim-1 {
+    0% {
+      clip-path: inset(44px 0 56px 0);
+      transform: translate(-2px, 2px);
+    }
+    20% {
+      clip-path: inset(23px 0 44px 0);
+      transform: translate(2px, -2px);
+    }
+    40% {
+      clip-path: inset(19px 0 45px 0);
+      transform: translate(1px, 1px);
+    }
+    60% {
+      clip-path: inset(2px 0 78px 0);
+      transform: translate(-1px, -1px);
+    }
+    80% {
+      clip-path: inset(7px 0 84px 0);
+      transform: translate(2px, -2px);
+    }
+    100% {
+      clip-path: inset(52px 0 3px 0);
+      transform: translate(-2px, 2px);
+    }
+  }
+
+  @keyframes glitch-anim-2 {
+    0% {
+      clip-path: inset(31px 0 72px 0);
+      transform: translate(2px, -2px);
+    }
+    20% {
+      clip-path: inset(11px 0 32px 0);
+      transform: translate(-2px, 2px);
+    }
+    40% {
+      clip-path: inset(88px 0 64px 0);
+      transform: translate(1px, -1px);
+    }
+    60% {
+      clip-path: inset(99px 0 18px 0);
+      transform: translate(-1px, 1px);
+    }
+    80% {
+      clip-path: inset(50px 0 64px 0);
+      transform: translate(2px, 2px);
+    }
+    100% {
+      clip-path: inset(44px 0 56px 0);
+      transform: translate(-2px, -2px);
+    }
+  }
+
+  /* Effects */
+  .scanline {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 50%,
+      rgba(0, 0, 0, 0.5) 50%
+    );
+    background-size: 100% 4px;
+    animation: scanline 10s linear infinite;
+    pointer-events: none;
+    opacity: 0.1;
+  }
+
+  .noise {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  /* Blend Mode Utilities */
+  .mix-blend-screen {
+    mix-blend-mode: screen;
+    pointer-events: none;
+    isolation: isolate;
+    z-index: 1;
+  }
+
+  .mix-blend-overlay {
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    isolation: isolate;
+  }
+
+  /* Animations */
+  @keyframes scanline {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(100%); }
+  }
+
+  @keyframes noise {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-5%, -5%); }
+    20% { transform: translate(-10%, 5%); }
+    30% { transform: translate(5%, -10%); }
+    40% { transform: translate(-5%, 15%); }
+    50% { transform: translate(-10%, 5%); }
+    60% { transform: translate(15%, 0); }
+    70% { transform: translate(0, 10%); }
+    80% { transform: translate(-15%, 0); }
+    90% { transform: translate(10%, 5%); }
+  }
+}
+
+/* Custom Utilities */
+@layer utilities {
+  .no-tap-highlight {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .no-drag {
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+}

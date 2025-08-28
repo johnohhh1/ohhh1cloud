@@ -1,0 +1,58 @@
+// transitions.js
+
+export const transitionStyles = {
+  fade: {
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 }
+  },
+  'slide-left': {
+    from: { transform: 'translateX(100%)', opacity: 0 },
+    enter: { transform: 'translateX(0%)', opacity: 1 },
+    leave: { transform: 'translateX(-100%)', opacity: 0 }
+  },
+  'slide-up': {
+    from: { transform: 'translateY(100%)', opacity: 0 },
+    enter: { transform: 'translateY(0%)', opacity: 1 },
+    leave: { transform: 'translateY(-100%)', opacity: 0 }
+  },
+  'zoom-in': {
+    from: { transform: 'scale(0.5)', opacity: 0 },
+    enter: { transform: 'scale(1)', opacity: 1 },
+    leave: { transform: 'scale(1.5)', opacity: 0 }
+  },
+  'zoom-out': {
+    from: { transform: 'scale(1.5)', opacity: 0 },
+    enter: { transform: 'scale(1)', opacity: 1 },
+    leave: { transform: 'scale(0.5)', opacity: 0 }
+  },
+  'fade-up': {
+    from: { transform: 'translateY(20px)', opacity: 0 },
+    enter: { transform: 'translateY(0px)', opacity: 1 },
+    leave: { transform: 'translateY(-20px)', opacity: 0 }
+  },
+  'fade-down': {
+    from: { transform: 'translateY(-20px)', opacity: 0 },
+    enter: { transform: 'translateY(0px)', opacity: 1 },
+    leave: { transform: 'translateY(20px)', opacity: 0 }
+  },
+  'push': {
+    from: { transform: 'translateX(100%)', opacity: 0 },
+    enter: { transform: 'translateX(0%)', opacity: 1 },
+    leave: { transform: 'translateX(-50%)', opacity: 0 }
+  }
+}
+
+// Optimized spring config for smooth transitions
+export const defaultSpringConfig = {
+  tension: 200,    // Reduced for smoother motion
+  friction: 20,    // Reduced for more natural movement
+  mass: 1,         // Default mass
+  clamp: false,    // Allow overshooting for natural feel
+  velocity: 0      // Start from rest
+}
+
+export const getDurationConfig = (duration) => ({
+  duration: duration * 1000,
+  easing: t => t * (2 - t) // Ease-out quadratic
+})

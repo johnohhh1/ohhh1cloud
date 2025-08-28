@@ -1,0 +1,156 @@
+PROJECT STRUCTURE AND FILE PURPOSES
+
+Core Application Files:
+----------------------
+src/App.jsx
+- Main application component
+- Contains core layout and routing
+- Imports and uses Slideshow, Navigation, and Settings components
+
+src/index.css
+- Main stylesheet
+- Contains Tailwind directives
+- Custom styles for animations and transitions
+- Base layout styles
+
+Components:
+----------
+src/components/Slideshow.jsx
+- Handles image display and transitions
+- Uses React Spring for animations
+- Implements swipe gestures
+- Core slideshow functionality
+
+src/components/Navigation.jsx
+- Controls bar (prev, next, play/pause, fullscreen)
+- Bottom navigation interface
+- Handles slideshow controls
+
+src/components/Settings.jsx
+- Settings panel UI
+- Handles transition options, timing, and display settings
+- Contains image source management
+
+src/components/GoogleDriveAuth.jsx
+- Google Drive integration
+- Authentication handling
+- Folder selection dialog
+
+src/components/DropboxAuth.jsx
+- Dropbox integration
+- Authentication handling
+- Folder selection dialog
+
+src/components/GoogleDriveFolderDialog.jsx
+- Folder selection UI for Google Drive
+- Used by GoogleDriveAuth component
+
+src/components/DropboxFolderDialog.jsx
+- Folder selection UI for Dropbox
+- Used by DropboxAuth component
+
+Services:
+---------
+src/services/driveService.js
+- Google Drive API integration
+- Image listing and fetching
+- Cache management for Drive images
+
+src/services/dropboxService.js
+- Dropbox API integration
+- Image listing and fetching
+- Cache management for Dropbox images
+
+src/services/imageCache.js
+- Image caching implementation
+- Memory management
+- Used by both drive and dropbox services
+
+Animations:
+----------
+src/animations/transitions.js
+- Defines transition animations
+- Currently partially redundant with Slideshow.jsx transitions
+- Could be consolidated with React Spring transitions
+
+State Management:
+---------------
+src/store.js
+- Zustand store implementation
+- Manages application state
+- Handles image sources and settings
+
+Configuration Files:
+------------------
+.env
+- Environment variables
+- API keys and client IDs
+
+.env.example
+- Template for environment variables
+- Documentation for required keys
+
+postcss.config.js
+- PostCSS configuration
+- Tailwind and autoprefixer setup
+
+tailwind.config.js
+- Tailwind CSS configuration
+- Content paths and theme settings
+
+vite.config.js
+- Vite bundler configuration
+- Development server settings
+
+.vscode/settings.json
+- VS Code editor settings
+- CSS validation rules
+
+package.json
+- Project dependencies
+- Scripts and metadata
+
+Utilities:
+---------
+src/utils/security.js
+- Security utilities
+- Sensitive data masking
+- Logging helpers
+
+Documentation:
+------------
+docs/transitions.txt
+- Transition documentation
+- Some redundancy with transitions.js
+- Could be updated to reflect React Spring usage
+
+docs/caching-strategy.txt
+- Caching documentation
+- Describes image caching approach
+
+POTENTIAL REDUNDANCIES:
+---------------------
+1. Transitions Definitions:
+   - transitions.js contains Framer Motion transitions
+   - Slideshow.jsx contains React Spring transitions
+   - Should consolidate to use only React Spring
+
+2. Folder Dialog Components:
+   - GoogleDriveFolderDialog and DropboxFolderDialog are very similar
+   - Could potentially be unified into a single reusable component
+
+3. Image Caching:
+   - Both drive and dropbox services implement similar caching logic
+   - Could potentially share more code through imageCache.js
+
+4. Documentation:
+   - transitions.txt describes old Framer Motion transitions
+   - Should be updated to match current React Spring implementation
+
+RECOMMENDATIONS:
+--------------
+1. Consolidate transition definitions into a single location
+2. Create a unified FolderDialog component
+3. Enhance imageCache.js to reduce duplication in services
+4. Update documentation to reflect current implementation
+5. Consider merging similar utility functions 
