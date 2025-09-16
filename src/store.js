@@ -13,7 +13,7 @@ const useStore = create(
       settings: {
         isOpen: false,
         interval: 5000,
-        transition: 'dissolve',
+        transition: 'fade-zoom',
         transitionDuration: 1.5,
         randomTransitions: false,
         shuffle: false,
@@ -60,7 +60,7 @@ const useStore = create(
         if (!images.length) return
 
         if (settings.randomTransitions) {
-          const transitions = ['fade', 'dissolve', 'slide-left', 'slide-up', 'zoom-in', 'zoom-out', 'rotate-in', 'flip-horizontal', 'iris', 'wave', 'curtain']
+          const transitions = ['fade', 'fade-zoom', 'slide-left', 'slide-up', 'zoom-in', 'zoom-out', 'rotate-in', 'flip-horizontal', 'bounce', 'drop', 'swing']
           const random = transitions[Math.floor(Math.random() * transitions.length)]
           set(state => ({
             settings: { ...state.settings, transition: random, transitionDuration: 1.5 }

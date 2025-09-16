@@ -31,24 +31,24 @@ export default function Settings() {
 
   const transitionOptions = [
     { value: 'fade', label: 'Fade' },
-    { value: 'dissolve', label: 'Dissolve (Blur)' },
     { value: 'cross-fade', label: 'Cross Fade' },
+    { value: 'fade-zoom', label: 'Fade Zoom' },
     { value: 'slide-left', label: 'Slide Left' },
     { value: 'slide-right', label: 'Slide Right' },
     { value: 'slide-up', label: 'Slide Up' },
     { value: 'slide-down', label: 'Slide Down' },
-    { value: 'zoom-in', label: 'Zoom In' },
-    { value: 'zoom-out', label: 'Zoom Out' },
-    { value: 'rotate-in', label: 'Rotate In' },
-    { value: 'flip-horizontal', label: 'Flip Horizontal' },
-    { value: 'flip-vertical', label: 'Flip Vertical' },
+    { value: 'slide-fade-left', label: 'Slide Fade Left' },
+    { value: 'slide-fade-up', label: 'Slide Fade Up' },
     { value: 'push-left', label: 'Push Left' },
     { value: 'push-up', label: 'Push Up' },
-    { value: 'cube-left', label: 'Cube' },
-    { value: 'wave', label: 'Wave' },
-    { value: 'iris', label: 'Iris (Circle)' },
-    { value: 'curtain', label: 'Curtain' },
-    { value: 'diagonal-wipe', label: 'Diagonal Wipe' }
+    { value: 'zoom-in', label: 'Zoom In' },
+    { value: 'zoom-out', label: 'Zoom Out' },
+    { value: 'rotate-in', label: 'Rotate' },
+    { value: 'flip-horizontal', label: 'Flip Horizontal' },
+    { value: 'flip-vertical', label: 'Flip Vertical' },
+    { value: 'bounce', label: 'Bounce' },
+    { value: 'swing', label: 'Swing' },
+    { value: 'drop', label: 'Drop In' }
   ]
 
   const transitionSpeeds = [

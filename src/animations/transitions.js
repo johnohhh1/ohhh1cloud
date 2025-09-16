@@ -1,5 +1,5 @@
 // src/animations/transitions.js
-// Enhanced transitions with smoother, more sophisticated effects
+// Transitions that actually work with react-spring's useTransition
 
 export const transitionStyles = {
   fade: {
@@ -9,27 +9,27 @@ export const transitionStyles = {
   },
   
   'slide-left': {
-    from: { opacity: 0, transform: 'translateX(100%)' },
-    enter: { opacity: 1, transform: 'translateX(0%)' },
-    leave: { opacity: 0, transform: 'translateX(-100%)' },
+    from: { opacity: 0, transform: 'translate3d(100%,0,0)' },
+    enter: { opacity: 1, transform: 'translate3d(0%,0,0)' },
+    leave: { opacity: 0, transform: 'translate3d(-100%,0,0)' },
   },
   
   'slide-right': {
-    from: { opacity: 0, transform: 'translateX(-100%)' },
-    enter: { opacity: 1, transform: 'translateX(0%)' },
-    leave: { opacity: 0, transform: 'translateX(100%)' },
+    from: { opacity: 0, transform: 'translate3d(-100%,0,0)' },
+    enter: { opacity: 1, transform: 'translate3d(0%,0,0)' },
+    leave: { opacity: 0, transform: 'translate3d(100%,0,0)' },
   },
   
   'slide-up': {
-    from: { opacity: 0, transform: 'translateY(100%)' },
-    enter: { opacity: 1, transform: 'translateY(0%)' },
-    leave: { opacity: 0, transform: 'translateY(-100%)' },
+    from: { opacity: 0, transform: 'translate3d(0,100%,0)' },
+    enter: { opacity: 1, transform: 'translate3d(0,0%,0)' },
+    leave: { opacity: 0, transform: 'translate3d(0,-100%,0)' },
   },
   
   'slide-down': {
-    from: { opacity: 0, transform: 'translateY(-100%)' },
-    enter: { opacity: 1, transform: 'translateY(0%)' },
-    leave: { opacity: 0, transform: 'translateY(100%)' },
+    from: { opacity: 0, transform: 'translate3d(0,-100%,0)' },
+    enter: { opacity: 1, transform: 'translate3d(0,0%,0)' },
+    leave: { opacity: 0, transform: 'translate3d(0,100%,0)' },
   },
   
   'zoom-in': {
@@ -45,9 +45,9 @@ export const transitionStyles = {
   },
   
   'rotate-in': {
-    from: { opacity: 0, transform: 'rotate(-180deg) scale(0.5)' },
-    enter: { opacity: 1, transform: 'rotate(0deg) scale(1)' },
-    leave: { opacity: 0, transform: 'rotate(180deg) scale(0.5)' },
+    from: { opacity: 0, transform: 'scale(0.5) rotate(-180deg)' },
+    enter: { opacity: 1, transform: 'scale(1) rotate(0deg)' },
+    leave: { opacity: 0, transform: 'scale(0.5) rotate(180deg)' },
   },
   
   'flip-horizontal': {
@@ -62,90 +62,58 @@ export const transitionStyles = {
     leave: { opacity: 0, transform: 'rotateX(180deg)' },
   },
   
-  'dissolve': {
-    from: { opacity: 0, filter: 'blur(20px)' },
-    enter: { opacity: 1, filter: 'blur(0px)' },
-    leave: { opacity: 0, filter: 'blur(20px)' },
-  },
-  
-  'fade-through-black': {
-    from: { opacity: 0, backgroundColor: 'black' },
-    enter: { opacity: 1, backgroundColor: 'transparent' },
-    leave: { opacity: 0, backgroundColor: 'black' },
+  'fade-zoom': {
+    from: { opacity: 0, transform: 'scale(0.9)' },
+    enter: { opacity: 1, transform: 'scale(1)' },
+    leave: { opacity: 0, transform: 'scale(1.1)' },
   },
   
   'cross-fade': {
     from: { opacity: 0 },
     enter: { opacity: 1 },
-    leave: { opacity: 0.5 },
+    leave: { opacity: 0.3 },
   },
   
   'push-left': {
-    from: { opacity: 0.8, transform: 'translateX(100%)' },
-    enter: { opacity: 1, transform: 'translateX(0%)' },
-    leave: { opacity: 0.8, transform: 'translateX(-50%)' },
+    from: { opacity: 1, transform: 'translate3d(100%,0,0)' },
+    enter: { opacity: 1, transform: 'translate3d(0%,0,0)' },
+    leave: { opacity: 1, transform: 'translate3d(-50%,0,0)' },
   },
   
   'push-up': {
-    from: { opacity: 0.8, transform: 'translateY(100%)' },
-    enter: { opacity: 1, transform: 'translateY(0%)' },
-    leave: { opacity: 0.8, transform: 'translateY(-50%)' },
+    from: { opacity: 1, transform: 'translate3d(0,100%,0)' },
+    enter: { opacity: 1, transform: 'translate3d(0,0%,0)' },
+    leave: { opacity: 1, transform: 'translate3d(0,-50%,0)' },
   },
   
-  'cube-left': {
-    from: { opacity: 0, transform: 'translateX(100%) rotateY(-90deg) translateZ(100px)' },
-    enter: { opacity: 1, transform: 'translateX(0%) rotateY(0deg) translateZ(0px)' },
-    leave: { opacity: 0, transform: 'translateX(-100%) rotateY(90deg) translateZ(100px)' },
+  'swing': {
+    from: { opacity: 0, transform: 'rotate(-10deg)' },
+    enter: { opacity: 1, transform: 'rotate(0deg)' },
+    leave: { opacity: 0, transform: 'rotate(10deg)' },
   },
   
-  'wave': {
-    from: { opacity: 0, transform: 'translateY(100%) rotate(10deg)' },
-    enter: { opacity: 1, transform: 'translateY(0%) rotate(0deg)' },
-    leave: { opacity: 0, transform: 'translateY(-100%) rotate(-10deg)' },
+  'drop': {
+    from: { opacity: 0, transform: 'translate3d(0,-100%,0) scale(0.75)' },
+    enter: { opacity: 1, transform: 'translate3d(0,0%,0) scale(1)' },
+    leave: { opacity: 0, transform: 'translate3d(0,10%,0) scale(0.75)' },
   },
   
-  'iris': {
-    from: { 
-      opacity: 0, 
-      clipPath: 'circle(0% at 50% 50%)'
-    },
-    enter: { 
-      opacity: 1, 
-      clipPath: 'circle(100% at 50% 50%)'
-    },
-    leave: { 
-      opacity: 0, 
-      clipPath: 'circle(0% at 50% 50%)'
-    },
+  'bounce': {
+    from: { opacity: 0, transform: 'scale(0.3)' },
+    enter: { opacity: 1, transform: 'scale(1)' },
+    leave: { opacity: 0, transform: 'scale(0.3)' },
+    config: { tension: 180, friction: 12 }
   },
   
-  'curtain': {
-    from: { 
-      opacity: 0, 
-      clipPath: 'polygon(50% 0%, 50% 0%, 50% 100%, 50% 100%)'
-    },
-    enter: { 
-      opacity: 1, 
-      clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
-    },
-    leave: { 
-      opacity: 0, 
-      clipPath: 'polygon(50% 0%, 50% 0%, 50% 100%, 50% 100%)'
-    },
+  'slide-fade-left': {
+    from: { opacity: 0, transform: 'translate3d(50%,0,0)' },
+    enter: { opacity: 1, transform: 'translate3d(0%,0,0)' },
+    leave: { opacity: 0, transform: 'translate3d(-50%,0,0)' },
   },
   
-  'diagonal-wipe': {
-    from: { 
-      opacity: 0, 
-      clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)'
-    },
-    enter: { 
-      opacity: 1, 
-      clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)'
-    },
-    leave: { 
-      opacity: 0, 
-      clipPath: 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)'
-    },
+  'slide-fade-up': {
+    from: { opacity: 0, transform: 'translate3d(0,50%,0)' },
+    enter: { opacity: 1, transform: 'translate3d(0,0%,0)' },
+    leave: { opacity: 0, transform: 'translate3d(0,-50%,0)' },
   }
 };
