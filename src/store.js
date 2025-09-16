@@ -13,8 +13,8 @@ const useStore = create(
       settings: {
         isOpen: false,
         interval: 5000,
-        transition: 'fade',
-        transitionDuration: 0.8,
+        transition: 'dissolve',
+        transitionDuration: 1.5,
         randomTransitions: false,
         shuffle: false,
         googleDrive: {
@@ -60,10 +60,10 @@ const useStore = create(
         if (!images.length) return
 
         if (settings.randomTransitions) {
-          const transitions = ['fade', 'slide-left', 'slide-up', 'zoom-in', 'zoom-out']
+          const transitions = ['fade', 'dissolve', 'slide-left', 'slide-up', 'zoom-in', 'zoom-out', 'rotate-in', 'flip-horizontal', 'iris', 'wave', 'curtain']
           const random = transitions[Math.floor(Math.random() * transitions.length)]
           set(state => ({
-            settings: { ...state.settings, transition: random, transitionDuration: 0.8 }
+            settings: { ...state.settings, transition: random, transitionDuration: 1.5 }
           }))
         }
 
